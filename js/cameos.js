@@ -3,14 +3,14 @@
 //   heli:   the pilot stands by the helicopter, flies with you, and has a line when he drops you off
 //   serres: a man on the platform who greets the arriving train with one word
 //   port:   a fan in a yellow-black scarf who shouts when the ship leaves
-//   exit:   a small excavation (one column) on the way out of town, two ladies arguing next to it
+//   εθνική: a small excavation (one column) in the fields by the road out of town, two ladies arguing next to it
 // VOICE KEYS (optional files, bubbles always show): vo_cam_onfire, vo_cam_pilot, vo_cam_telos, vo_cam_venga, vo_cam_millions
 'use strict';
 (function () {
   const TS = G.TS || 16;
   const INK = 'rgba(28,20,36,0.85)', SHADOW = 'rgba(20,10,30,0.28)';
   const L = k => G.LOOKS[k];
-  const DIG = { x: 90, y: 10, w: 4, h: 3 }; // excavation pit (tiles), grass by the road leaving town (top-right)
+  const DIG = { x: 199, y: 43, w: 4, h: 2 }; // excavation pit (tiles): fields by the εθνική, a little before the Ferrari farm
   let npcs = [], lastBaskets = 0, crumbs = [], ladyT = 3;
 
   const say = (key, text, who, dur) => G.audio.say(key, text, who, dur);

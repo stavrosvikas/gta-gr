@@ -283,6 +283,18 @@
     if (scene.hint) U.pill(G.W / 2, objTop - 8, U.clip(scene.hint, Math.max(100, G.W - 220), 8), mob ? null : (scene.hintKey || 'E'), T.blue);
     // --- left under the minimap: phone shortcut ---
     if (!mob) { const unread = G.unreadSms ? G.unreadSms() : 0; U.box(8, 8, 74, 16, T.panel, T.line, unread ? T.gold : null); U.chip(14, 19, 'Q'); U.text(30, 19, 'Κινητό' + (unread ? ' (' + unread + ')' : ''), 7.5, unread ? T.gold : '#fff', 'left', null); }
+    // --- PC: the other keys, bottom-right above the zone name (changes on foot / in a vehicle) ---
+    if (!mob && scene === G.worldScene) {
+      const v = G.player.vehicle;
+      const keys = v ? [['R', 'Ραδιόφωνο ' + (st.radioOn ? 'ON' : 'OFF')], ['SPACE', 'Χειρόφρενο'], ['E', 'Βγες'], ['M', 'Χάρτης']]
+        : [['SPACE', 'Χτύπα'], ['E', 'Μπες / μίλα'], ['M', 'Χάρτης']];
+      if (v && v.two) keys.shift(); // no radio on two wheels
+      keys.forEach(([k, label], i) => {
+        const y = G.H - 32 - (keys.length - 1 - i) * 13; c.globalAlpha = 0.85;
+        const w = U.chip(G.W - 10, y, k, 'right'); U.text(G.W - 10 - w - 5, y, label, 7, '#fff', 'right', '#000');
+        c.globalAlpha = 1;
+      });
+    }
   };
 
   // ---------- mobile controls ----------

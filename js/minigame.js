@@ -41,7 +41,12 @@
         return;
       }
       if (m.phase === 'play') {
-        U.setMobile(typeof opts.buttons === 'function' ? opts.buttons.call(m) : (opts.buttons || []), opts.stick || 'stick');
+        { // always a visible way out on mobile: pause menu (continue / abandon), top-right
+          const bs = (typeof opts.buttons === 'function' ? opts.buttons.call(m) : (opts.buttons || [])).slice();
+          const taken = bs.some(b => b.pos && b.pos[0] > G.W - 40 && b.pos[1] < 40);
+          bs.push({ id: 'pause', label: 'ΕΞΟΔΟΣ', pos: [taken ? G.W - 56 : G.W - 22, 22], r: 14 });
+          U.setMobile(bs, opts.stick || 'stick');
+        }
         if (G.pressed('pause') && !G.input.virt.back) { G.audio.pauseMusic && G.audio.pauseMusic(true); G.push(G.PauseMini(m)); return; }
         m.pt += dt; opts.update && opts.update.call(m, dt);
         return;
@@ -62,6 +67,7 @@
       if (G.grade) G.grade(ctx);
       U.begin();
       if (m.phase === 'play' || m.phase === 'win' || m.phase === 'lose') { opts.hud && opts.hud.call(m); }
+      if (m.phase === 'play' && G.device !== 'mobile' && m.pt < 6) { U.ctx.globalAlpha = Math.min(1, (6 - m.pt) / 1.5); U.text(G.W - 6, G.H - 6, 'ESC: παύση / έξοδος', 8, '#fff', 'right'); U.ctx.globalAlpha = 1; }
       U.drawOverlays();
       if (m.phase === 'intro') {
         const c = U.ctx; c.fillStyle = 'rgba(0,0,0,0.72)'; c.fillRect(0, 0, G.W, G.H);

@@ -143,6 +143,8 @@
   WS.placePlayer = function (px, py) {
     const pl = G.player; if (pl.vehicle) WS.exitVehicle();
     pl.x = px; pl.y = py; pl.vx = pl.vy = 0;
+    // never drop the player into a fence/wall/prop: jump to the nearest free spot
+    for (let i = 0; i < 4 && pl.wallHits && pl.wallHits(pl.x, pl.y); i++) pl.escapeWall(1);
     WS.camX = G.clamp(px - G.W / 2, 0, Wd.w * TS - G.W); WS.camY = G.clamp(py - G.H / 2, 0, Wd.h * TS - G.H);
   };
 

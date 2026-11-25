@@ -571,7 +571,8 @@
       // back on the map: where the player stands (herding) / next to the truck (after the drive), else the entry tile
       exitTo() {
         const ok = (lx, ly) => lx > 4 && ly > 4 && lx < AW * TS - 4 && ly < AH * TS - 4 && !worldSolid(lx, ly)
-          && Wd.walkable(SP.tx + Math.floor(lx / TS), SP.ty + Math.floor(ly / TS));
+          && Wd.walkable(SP.tx + Math.floor(lx / TS), SP.ty + Math.floor(ly / TS))
+          && ![[-4, -3], [4, -3], [-4, 2], [4, 2]].some(([dx, dy]) => Wd.solidAt(OX + lx + dx, OY + ly + dy) || worldSolid(lx + dx, ly + dy));
         const c = [];
         if (this.stage === 'herd' && this.player) c.push([this.player.x, this.player.y]);
         else if (this.truck) { const v = this.truck; c.push([v.x + Math.cos(v.a + Math.PI / 2) * (v.wid / 2 + 10), v.y + Math.sin(v.a + Math.PI / 2) * (v.wid / 2 + 10)], [v.x - Math.cos(v.a + Math.PI / 2) * (v.wid / 2 + 10), v.y - Math.sin(v.a + Math.PI / 2) * (v.wid / 2 + 10)]); }

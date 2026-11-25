@@ -179,12 +179,28 @@
     }
     // standing in the shallow sea (wading/swimming: slower, drawn head-and-shoulders only)
     inWater() { return !this.solidFn && isShallowT(Math.floor(this.x / TS), Math.floor((this.y - 2) / TS)); }
+    // how many of the 4 foot corners touch a wall/prop (0 = free)
+    wallHits(x, y) { const f = this.solidFn || Wd.solidAt; return (f(x - 3, y - 2) ? 1 : 0) + (f(x + 3, y - 2) ? 1 : 0) + (f(x - 3, y + 1) ? 1 : 0) + (f(x + 3, y + 1) ? 1 : 0); }
+    // ended up inside a wall (knocked, shoved, dropped off): slide to the nearest free spot instead of freezing there
+    escapeWall(dt) {
+      for (const d of [1, 2, 3, 4, 6, 8, 10, 13, 16, 20, 24, 30]) for (let i = 0; i < 16; i++) {
+        const ux = Math.cos(i * Math.PI / 8), uy = Math.sin(i * Math.PI / 8), x = this.x + ux * d, y = this.y + uy * d;
+        if (this.wallHits(x, y) || (!this.solidFn && G.Sim.blockedForPerson && G.Sim.blockedForPerson(x, y))) continue;
+        const k = Math.min(d, Math.max(1, 80 * dt)); this.x += ux * k; this.y += uy * k; return true;
+      }
+      return false;
+    }
     move(dx, dy, dt) {
       if ((dx || dy) && this.inWater()) { dx *= 0.6; dy *= 0.6; }
-      const nx = this.x + dx * dt, ny = this.y + dy * dt;
       let moved = false;
-      if (!this.blocked(nx, this.y)) { this.x = nx; moved = true; }
-      if (!this.blocked(this.x, ny)) { this.y = ny; moved = true; }
+      const c0 = this.noclip ? 0 : this.wallHits(this.x, this.y);
+      if (c0 && this.isPlayer) { this.escapeWall(dt); moved = true; }
+      const nx = this.x + dx * dt, ny = this.y + dy * dt;
+      // already touching a wall: any step that doesn't go deeper is fine (never frozen in place)
+      const stuck = !this.noclip && this.wallHits(this.x, this.y);
+      const ok = (x, y) => stuck ? this.wallHits(x, y) <= stuck && !(!this.solidFn && !this.ghostVeh && G.Sim.vehBlocks(this, x, y)) : !this.blocked(x, y);
+      if (ok(nx, this.y)) { this.x = nx; moved = true; }
+      if (ok(this.x, ny)) { this.y = ny; moved = true; }
       if (dx || dy) {
         this.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 2 : 1) : (dy > 0 ? 0 : 3);
         this.anim += dt * Math.hypot(dx, dy) / 7; this.frame = [0, 1, 0, 2][Math.floor(this.anim) % 4];

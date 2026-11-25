@@ -25,14 +25,7 @@
   // ---------- shared tiny sound helper (same as beach.js; whichever loads first defines it) ----------
   G.modSfx = G.modSfx || (function () {
     let ac = null, out = null; const have = {};
-    const probe = key => {
-      if (key in have) return; have[key] = false;
-      try {
-        const exts = ['mp3', 'wav', 'ogg', 'm4a']; let i = 0; const el = new Audio(); el.preload = 'auto';
-        const next = () => { if (i < exts.length) el.src = 'assets/sounds/sfx_' + key + '.' + exts[i++]; };
-        el.addEventListener('canplaythrough', () => { have[key] = true; }, { once: true }); el.addEventListener('error', next); next();
-      } catch (e) {}
-    };
+    const probe = key => { have[key] = !!(G.audio && G.audio.has && G.audio.has('sfx_' + key)); };
     const getAc = () => {
       if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); out = ac.createGain(); out.gain.value = 0.35; out.connect(ac.destination); } catch (e) { ac = null; } }
       if (ac && ac.state === 'suspended') ac.resume(); return ac;

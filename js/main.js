@@ -24,6 +24,7 @@
       try {
         if (s) { s.update(dt); }
         G.ui.update(dt);
+        G.audio.endFrame();
         const s2 = G.top(); G.ctx.setTransform(G.RS, 0, 0, G.RS, 0, 0); if (s2) s2.render(G.ctx);
         if (G.device === 'mobile' && G.portrait) { const c = G.ui.ctx; c.fillStyle = 'rgba(0,0,0,0.85)'; c.fillRect(0, 0, G.W, G.H); G.ui.title(G.W / 2, G.H / 2 - 10, '↻', 40, '#ffd400'); G.ui.text(G.W / 2, G.H / 2 + 24, 'Γύρισε το κινητό οριζόντια', 14, '#fff', 'center'); }
       } catch (e) { console.error(e); G.lastError = e; }

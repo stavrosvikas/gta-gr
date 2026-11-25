@@ -9,8 +9,8 @@
 //   beach_gtr_hum       «♪ ♪ ♪»            (humming along)
 //   beach_racket_sorry  «Συγγνώμη!»
 //   beach_racket_nice   «Ωραία μπαλιά!»
-//   beach_rep_q0..q3    reporter questions (see TV below)
-//   beach_sun_a0..a3    sunbather answers
+//   beach_rep_q0..q2    reporter questions (see TV below)
+//   beach_sun_a0..a2    sunbather answers
 //   beach_buried_0      «Βγάλτε με!»
 //   beach_buried_1      «Μου έρχεται φτέρνισμα!»
 //   beach_bike_splash   «Πάλι βράχηκα!»
@@ -39,14 +39,7 @@
   // ---------- shared tiny sound helper (file if present, otherwise a soft synth) ----------
   G.modSfx = G.modSfx || (function () {
     let ac = null, out = null; const have = {};
-    const probe = key => {
-      if (key in have) return; have[key] = false;
-      try {
-        const exts = ['mp3', 'wav', 'ogg', 'm4a']; let i = 0; const el = new Audio(); el.preload = 'auto';
-        const next = () => { if (i < exts.length) el.src = 'assets/sounds/sfx_' + key + '.' + exts[i++]; };
-        el.addEventListener('canplaythrough', () => { have[key] = true; }, { once: true }); el.addEventListener('error', next); next();
-      } catch (e) {}
-    };
+    const probe = key => { have[key] = !!(G.audio && G.audio.has && G.audio.has('sfx_' + key)); };
     const getAc = () => {
       if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); out = ac.createGain(); out.gain.value = 0.35; out.connect(ac.destination); } catch (e) { ac = null; } }
       if (ac && ac.state === 'suspended') ac.resume(); return ac;
@@ -244,20 +237,20 @@
 
   // =====================================================================================
   // c) sunbather + TV crew
+  // one short interview, always in this order, so each answer fits its question
   const TVQ = [
-    ['Μια δήλωση για το καλοκαίρι;', 'Gyro me tzatziki kai moustarda!'],
-    ['Τι λέτε για τον καύσωνα;', 'Gyro me tzatziki kai moustarda!'],
-    ['Πώς βλέπετε την τουριστική περίοδο;', 'Gyro me tzatziki kai moustarda!'],
-    ['Δύο λόγια για τους τηλεθεατές;', 'Gyro me tzatziki kai moustarda!'],
+    ['Τι σας αρέσει πιο πολύ στην Ελλάδα;', 'Gyros!'],
+    ['Μόνο αυτό; Κάτι άλλο;', 'Gyros souvlaki!'],
+    ['Και με τι τον τρώτε;', 'Mustard sauce, ha!'],
   ];
   function mkTV(cx, cy) {
     const sun = { x: cx + 11, y: cy + 22 }; // bubble anchor just above her head
     const rep = { look: L.rep, x: cx + 23, y: cy - 1 }, cam = { look: L.cam, x: cx + 38, y: cy + 3 };
-    const t = { kind: 'tv', cx, cy, cd: G.rand(1, 3), qi: Math.floor(Math.random() * TVQ.length), pending: 0, kick: 0 };
+    const t = { kind: 'tv', cx, cy, cd: G.rand(1, 3), qi: 0, pending: 0, kick: 0 };
     t.update = dt => {
       t.cd -= dt;
-      if (t.pending > 0) { t.pending -= dt; if (t.pending <= 0) say('beach_sun_a' + (t.ai % 3), ['Gyros!', 'Gyros souvlaki!', 'Mustard sauce, ha!'][t.ai % 3], sun, 2.4); }
-      if (t.cd < 0 && near(cx + 15, cy, 105)) { t.cd = G.rand(11, 15); t.ai = t.qi % TVQ.length; say('beach_rep_q' + t.ai, TVQ[t.ai][0], rep, 2.6); t.qi++; t.pending = 2.8; }
+      if (t.pending > 0) { t.pending -= dt; if (t.pending <= 0) say('beach_sun_a' + t.ai, TVQ[t.ai][1], sun, 2.4); }
+      if (t.cd < 0 && near(cx + 15, cy, 105)) { t.cd = t.qi % TVQ.length === TVQ.length - 1 ? G.rand(14, 18) : 6; t.ai = t.qi % TVQ.length; say('beach_rep_q' + t.ai, TVQ[t.ai][0], rep, 2.6); t.qi++; t.pending = 2.8; }
     };
     t.ground = (x, camX, camY) => drawSunbather(x, cx - camX, cy - camY);
     t.sprites = (push, camX, camY) => {

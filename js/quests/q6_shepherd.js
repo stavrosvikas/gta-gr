@@ -935,6 +935,7 @@ const RIDER = [['vo_rider_1', 'Ήσυχα ρεεε!'], ['vo_rider_2', 'Εεει�
       },
       update(dt) {
         const m = this;
+        { const me = m.veh || m.moto; if (me) G.audio.engines(me.x, me.y, [m.moto], m.stage === 'p1' ? m.moto : null); }
         for (const q of m.parts) { q.t += dt; q.x += q.vx * dt; q.y += q.vy * dt; }
         m.parts = m.parts.filter(q => q.t < q.life);
         if (m.stage === 'p1') {

@@ -300,7 +300,7 @@
       update(dt) {
         const S = this.S, v = this.car, c = this.cyc, cl = S.cl;
         // ----- player -----
-        driveCar(v, dt);
+        driveCar(v, dt); G.audio.engines(v.x, v.y, [v], v);
         // potholes
         for (const p of S.pots) {
           p.cd -= dt;

@@ -635,7 +635,7 @@
 
       update(dt) {
         const Rd = this.Rd, v = this.car, max = this.max;
-        this.talkCd -= dt; this.panCd -= dt; this.elaT -= dt;
+        this.talkCd -= dt; this.panCd -= dt; this.elaT -= dt; G.audio.engines(v.x, v.y, [v], v);
         // ----- drive -----
         const before = Math.abs(v.speed);
         const hit = driveCar(v, dt);

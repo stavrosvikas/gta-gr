@@ -339,6 +339,7 @@
 
     if (pl.vehicle) WS.updateDriving(dt); else WS.updateOnFoot(dt);
     S.update(dt);
+    WS.sound(dt);
     mods(m => m.update && m.update(dt));
     WS.drops = (WS.drops || []).filter(d => {
       d.t += dt; if (d.t > 25) return false;
@@ -459,6 +460,19 @@
   };
 
   // ---------- driving: the car goes where the arrows point ----------
+  // world sound: every vehicle near you sounds from where it is (engines, police sirens), a quiet city bed,
+  // and now and then a stray dog barking somewhere off-screen
+  WS.sound = function (dt) {
+    const pl = G.player, me = pl.vehicle || pl, A = G.audio;
+    A.engines(me.x, me.y, S.vehicles, pl.vehicle);
+    A.ambience('loop_city', pl.vehicle ? 0.07 : 0.11);
+    WS.dogT = (WS.dogT == null ? G.rand(4, 9) : WS.dogT) - dt;
+    if (WS.dogT <= 0) {
+      const a = Math.random() * 6.28, r = G.rand(140, 380), n = G.chance(0.4) ? 2 : 1;
+      for (let i = 0; i < n; i++) setTimeout(() => A.sfxAt('bark', me.x + Math.cos(a) * r, me.y + Math.sin(a) * r, me.x, me.y, 0.6, 450), i * G.rand(250, 450));
+      WS.dogT = G.rand(9, 22);
+    }
+  };
   WS.updateDriving = function (dt) {
     const pl = G.player, v = pl.vehicle;
     const hit = G.driveDirect(v, dt, G.readAxis(), G.held('action') && G.device === 'pc');

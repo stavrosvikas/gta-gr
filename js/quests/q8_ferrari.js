@@ -699,7 +699,7 @@
         this.baaCd -= dt; this.crashCd -= dt; this.bounce = Math.max(0, this.bounce - dt); this.loadFx = Math.max(0, this.loadFx - dt);
         if (this.gateOpen) this.gateT = Math.min(1, this.gateT + dt * 1.6); // the gate swings open
         if (this.stage === 'herd') this.updHerd(dt);
-        else if (this.stage === 'drive') this.updDrive(dt);
+        else if (this.stage === 'drive') { this.updDrive(dt); const t = this.truck; G.audio.engines(t.x, t.y, [t], t); }
         else if (this.stage === 'count') this.updCount(dt);
         if (this.phase !== 'play') return;
         this.updFerrari(dt);

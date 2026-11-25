@@ -2,6 +2,10 @@
 
 Τα αρχεία μπαίνουν στο `game/assets/sounds/` με ακριβώς αυτό το όνομα (mp3, wav, ogg ή m4a). Όσο λείπει ένα αρχείο, η ατάκα φαίνεται μόνο σε φούσκα.
 
+**Μετά από κάθε νέο αρχείο τρέξε `python update_sounds.py`** (ξαναφτιάχνει το `js/sounds_list.js`, αλλιώς το παιχνίδι δεν ξέρει ότι υπάρχει). Για έλεγχο: στην κονσόλα του browser `G.audio.status()`.
+
+Παραλλαγές: `sfx_bark2`, `sfx_bark3`… παίζουν τυχαία μία κάθε φορά.
+
 ## Έχουν μπει (από το Premiere, A2)
 
 | Αρχείο | Ατάκα |
@@ -39,6 +43,18 @@
 | `vo_beach_sun_a2` | «Mustard sauce, ha!» |
 | `radio_song` | Μην παραχαράσσετε την ιστορία (megamix), ραδιόφωνο στο αμάξι |
 | `music_dance` | Όλα αυτά που φοβάμαι, ο χορός στο Σύνταγμα (~86 bpm, οι νότες είναι συγχρονισμένες) |
+
+## Οχήματα, πόλη, σκυλιά (Epidemic Sound μέσω Higgsfield)
+
+| Αρχείο | Τι είναι |
+|---|---|
+| `loop_eng_car` | μηχανή αμαξιού (loop, ακούγεται από κάθε αμάξι κοντά σου, ανεβαίνει με την ταχύτητα) |
+| `loop_eng_big` | λεωφορείο, φορτηγό, βαν, σκουπιδιάρικο |
+| `loop_eng_moto` | μηχανάκι / παπάκι (και η μηχανή του τσοπάνη) |
+| `loop_siren` | σειρήνα περιπολικού / ΔΙΑΣ όσο κυνηγάει |
+| `loop_city` | πολύ χαμηλό «χαλί» πόλης στην Αθήνα |
+| `sfx_siren`, `sfx_horn`, `sfx_horn2`, `sfx_crash`, `sfx_skid`, `sfx_door`, `sfx_heli`, `sfx_boat_horn`, `sfx_train_horn` | εφέ |
+| `sfx_bark` … `sfx_bark4` | σκυλιά (αδέσποτα που γαβγίζουν κάπου γύρω σου + τα σκυλιά των αποστολών) |
 
 ## Λείπουν ακόμα
 
@@ -90,7 +106,7 @@
 
 ### Εφέ
 
-`sfx_baa`, `sfx_bad`, `sfx_bark`, `sfx_blip`, `sfx_cheer`, `sfx_coin`, `sfx_crash`, `sfx_door`, `sfx_good`, `sfx_hiss`, `sfx_hit`, `sfx_meow`, `sfx_mission_fail`, `sfx_mission_pass`, `sfx_punch`, `sfx_revive`, `sfx_siren`, `sfx_splash`, `sfx_star`, `sfx_tax`, `sfx_whoosh`, `sfx_train_horn`, `sfx_boat_horn`, `sfx_heli`, `sfx_tok`, `sfx_ball_bounce`, `sfx_ball_swish`, `sfx_ball_rim`
+`sfx_baa`, `sfx_bad`, `sfx_blip`, `sfx_cheer`, `sfx_coin`, `sfx_good`, `sfx_hiss`, `sfx_hit`, `sfx_meow`, `sfx_mission_fail`, `sfx_mission_pass`, `sfx_punch`, `sfx_revive`, `sfx_splash`, `sfx_star`, `sfx_tax`, `sfx_whoosh`, `sfx_tok`, `sfx_ball_bounce`, `sfx_ball_swish`, `sfx_ball_rim`
 
 ### Μουσική αποστολών
 

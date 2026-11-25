@@ -1225,6 +1225,7 @@
       }
       case 'stop': {
         const people = () => { for (const m of p.crowd) {
+          if (m.gone) { if (G.t < m.back) continue; m.gone = false; m.look = G.randomLook(); }
           if (!m.look) m.look = G.randomLook();
           const bob = Math.floor((G.t + m.t) * 1.2) % 4 === 0 ? 1 : 0;
           G.drawPerson(ctx, m.look, Math.round(x + 8 + m.dx), Math.round(y + 14 + m.dy), m.dir || 0, bob);

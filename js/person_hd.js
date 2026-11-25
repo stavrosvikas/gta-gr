@@ -106,6 +106,7 @@
       if (side) { leg(cx - lw / 2 - step * 1.4, 0, true); leg(cx - lw / 2 + step * 1.4, 0, true); }
       else { leg(cx - 0.4 - lw, Math.max(0, step) * 0.9, false); leg(cx + 0.4, Math.max(0, -step) * 0.9, false); }
       if (!skirt) blob(side ? rrf(cx - 2.8, 16.2, 5.6, 3.2, 1.4) : rrf(cx - 3.6, 16.2, 7.2, 3.0, 1.2), legs, -0.5, 0, -0.2); // hips
+      if (!skirt && has('leather')) { x.fillStyle = 'rgba(255,255,255,0.35)'; for (const lx of side ? [cx - 1] : [cx - 2.6, cx + 1.1]) { rr(x, lx, 16.8, 0.8, 5.6, 0.4); x.fill(); } }
       if (skirt) {
         const sc = gown ? top : legs, sy = gown ? 23.8 : 21.0, w0 = side ? 2.8 : 3.3, w1 = gown ? (side ? 4.4 : 5.6) : (side ? 3.7 : 4.7);
         blob(() => { x.moveTo(cx - w0, 15.8); x.lineTo(cx + w0, 15.8); x.quadraticCurveTo(cx + w1 - 0.3, sy - 2.5, cx + w1, sy); x.quadraticCurveTo(cx, sy + 0.9, cx - w1, sy); x.quadraticCurveTo(cx - w1 + 0.3, sy - 2.5, cx - w0, 15.8); x.closePath(); }, sc, -1.1, 0, -0.22);
@@ -127,6 +128,11 @@
       blob(rrf(-armW / 2, -0.4, armW, armL, armW / 2), col, -0.5, 0, -0.22);
       if (shortSleeve && !sleeveless) { x.save(); x.beginPath(); rrp(x, -armW / 2, -0.4, armW, armL, armW / 2); x.clip(); x.fillStyle = dark ? sh(skin, -0.15) : skin; x.fillRect(-armW, 2.2, armW * 2, armL); x.fillStyle = sh(skin, -0.25); x.fillRect(armW / 2 - 0.5, 2.2, 1, armL); x.restore(); }
       line(sh(col, -0.38), 0.28); x.beginPath(); rrp(x, -armW / 2, -0.4, armW, armL, armW / 2); x.stroke();
+      if (has('tattoo') && (sleeveless || shortSleeve)) { // ink on the bare part of the arm
+        const y0 = sleeveless ? 0.6 : 2.6; line('rgba(30,34,44,0.8)', 0.32); x.beginPath();
+        x.moveTo(-armW / 2 + 0.4, y0); x.quadraticCurveTo(armW / 2, y0 + 0.8, -armW / 2 + 0.5, y0 + 1.6); x.quadraticCurveTo(armW / 2 - 0.2, y0 + 2.4, -0.2, armL - 0.6);
+        x.moveTo(armW / 2 - 0.4, y0 + 0.3); x.lineTo(armW / 2 - 0.7, y0 + 1.4); x.stroke();
+      }
       blob(circ(0, armL + 0.2, 1.3), dark ? sh(skin, -0.15) : skin, -0.4, -0.4, -0.2);
       x.restore();
       return [sx - Math.sin(a) * (armL + 0.2), sy + Math.cos(a) * (armL + 0.2)];
@@ -164,6 +170,12 @@
       if (has('strap') && front) { line('#1b1b1b', 0.8); x.beginPath(); x.moveTo(tx + 1, ty + 0.2); x.lineTo(tx + tw - 0.8, ty + th - 0.8); x.stroke(); }
       if (has('necklace') && front) { line('#d6402f', 0.55); x.beginPath(); x.arc(cx, ty - 0.2, 2.3, 0.45, Math.PI - 0.45); x.stroke(); }
       if (has('gold') && front) { line('#f2c94c', 0.6); x.beginPath(); x.arc(cx, ty - 0.1, 2.6, 0.35, Math.PI - 0.35); x.stroke(); x.fillStyle = '#f2c94c'; x.beginPath(); x.arc(cx, ty + 2.5, 0.55, 0, 7); x.fill(); }
+      if (has('chain') && front) { line('#d8dce4', 0.35); x.beginPath(); x.arc(cx, ty - 0.6, 2.8, 0.3, Math.PI - 0.3); x.stroke(); }
+      if (has('crossNeck') && front) { line('#f2c94c', 0.3); x.beginPath(); x.arc(cx, ty - 0.4, 2.2, 0.4, Math.PI - 0.4); x.stroke(); x.fillStyle = '#f2c94c'; x.fillRect(cx - 0.18, ty + 1.4, 0.36, 1.3); x.fillRect(cx - 0.5, ty + 1.75, 1, 0.32); }
+      if (has('leather') && !robe) {
+        x.fillStyle = 'rgba(255,255,255,0.32)'; rr(x, tx + 1, ty + 0.9, 1.1, th - 2.4, 0.5); x.fill();
+        if (back) { line('#c9c9d2', 0.25); x.beginPath(); for (let i = 0; i < 4; i++) { const yy = ty + 1.3 + i * 1.3; x.moveTo(cx - 0.9, yy); x.lineTo(cx + 0.9, yy + 0.9); x.moveTo(cx + 0.9, yy); x.lineTo(cx - 0.9, yy + 0.9); } x.stroke(); }
+      }
       // arms
       if (side) hand = arm(cx - 0.2, ty + 0.9, -step * 0.42, false);
       else {
@@ -218,7 +230,7 @@
     };
     const facial = () => { // beards / masks / glasses (on top of hair edge as needed)
       if (back) return;
-      const bc = has('beardGrey') ? '#a9a8a2' : hair;
+      const bc = has('beardGrey') ? '#a9a8a2' : (accVal('beard') || hair);
       if (!fem && (has('beard') || has('beardGrey') || has('beardLong'))) {
         if (side) blob(() => { x.moveTo(hx - 1.6, 6.2); x.lineTo(hx - 0.4, 6.2); x.quadraticCurveTo(hx + 0.6, 9.4, hx + 3, 9.2); x.lineTo(hx + 5.2, 9.4); x.quadraticCurveTo(hx + 5.2, 12.6, hx + 2.2, 12.8); x.quadraticCurveTo(hx - 1.6, 12.6, hx - 1.6, 9); x.closePath(); }, bc, -0.5, -0.4);
         else blob(() => { x.moveTo(hx - HW - 0.1, 6.2); x.lineTo(hx - HW + 1.2, 6.2); x.quadraticCurveTo(hx - 3.6, 9.2, hx - 1.4, 9.1); x.lineTo(hx + 1.4, 9.1); x.quadraticCurveTo(hx + 3.6, 9.2, hx + HW - 1.2, 6.2); x.lineTo(hx + HW + 0.1, 6.2); x.quadraticCurveTo(hx + HW + 0.3, 12.9, hx, 13.1); x.quadraticCurveTo(hx - HW - 0.3, 12.9, hx - HW - 0.1, 6.2); x.closePath(); }, bc, -0.6, -0.5);

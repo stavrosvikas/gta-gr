@@ -42,6 +42,14 @@
     ['fd_bar_drink2', 'Πάρε αυτό. Θάρρος σε ποτήρι.'],
     ['fd_bar_drink3', 'Κι άλλο; Ποιον περιμένεις, φίλε μου;'],
   ];
+  // the couple in the free corner: she twerks, he cheers her on from his stool (voice files: vo_fd_bubble_1..4)
+  const BUBBLE = [
+    ['fd_bubble_1', 'Bubble butttt!'],
+    ['fd_bubble_2', 'Bubble bubble!'],
+    ['fd_bubble_3', 'Bubble butttt!'],
+    ['fd_bubble_4', 'Υπάρχει θέληση εδώ πέρα!'],
+  ];
+  const TW = { x: 17 * 16 + 4, my: 5 * 16 + 10, fy: 6 * 16 + 15 }; // his stool, her spot just in front of him
   const HOST_TALK = [
     ['fd_host_talk1', 'Το ραντεβού σου θα έρθει. Μάλλον.'],
     ['fd_host_talk2', 'Αν δεν σου κάτσει κανείς, ο μπάρμαν ακούει.'],
@@ -244,6 +252,25 @@
     x.restore();
   }
 
+  // bar stool + him sitting on it, leaning back, one hand up (clapping along)
+  function drawStoolGuy(ctx, o, cx, cy) {
+    const x = o.x - cx, y = o.y - cy;
+    ctx.fillStyle = SHADOW; ctx.beginPath(); ctx.ellipse(x, y + 1, 6, 2.2, 0, 0, 7); ctx.fill();
+    ctx.strokeStyle = '#2a2a30'; ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(x - 3.5, y); ctx.lineTo(x - 2.5, y - 6); ctx.moveTo(x + 3.5, y); ctx.lineTo(x + 2.5, y - 6); ctx.stroke();
+    const clap = Math.sin(G.t * 9) > 0;
+    ctx.save(); ctx.translate(x, y - 5); G.drawPerson(ctx, o.look, 0, 0, 0, clap ? 1 : 2); ctx.restore();
+    ctx.fillStyle = '#e9ecf0'; rr(ctx, x - 4.5, y - 7, 9, 2.2, 1); ctx.fill(); ink(ctx, 0.4); // white seat peeking out
+  }
+  // she faces the camera with her back to him and bounces her hips to the beat
+  function drawTwerk(ctx, o, cx, cy) {
+    const x = o.x - cx, y = o.y - cy, b = Math.abs(Math.sin(G.t * 10)), sway = Math.sin(G.t * 5) * 0.9;
+    ctx.fillStyle = SHADOW; ctx.beginPath(); ctx.ellipse(x, y + 1, 5, 1.8, 0, 0, 7); ctx.fill();
+    ctx.save(); ctx.translate(x + sway, y); ctx.scale(1 + b * 0.05, 1 - b * 0.07);
+    G.drawPerson(ctx, o.look, 0, 0, 0, b > 0.6 ? 1 : 0);
+    ctx.restore();
+    if (Math.sin(G.t * 10) > 0.92) { ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = 'bold 5px sans-serif'; ctx.fillText('✦', x + 7, y - 6); }
+  }
+
   // tile legend: collision only (the room is painted by paintRoom, not by the 1x tile cache)
   const LEG = {
     '.': { col: '#80593a' },
@@ -279,7 +306,8 @@
       this.A = G.Arena(ROWS, LEG);
       const look = G.state.look || G.randomLook();
       const p = this.player = new G.Ent.Person(look, DOOR[0] * TS + 8, 12 * TS + 10);
-      p.solidFn = (x, y) => solidAt(this.A, x, y); p.speed = 55; p.dir = 3;
+      p.solidFn = (x, y) => solidAt(this.A, x, y) || (Math.abs(x - TW.x) < 7 && y > TW.my - 6 && y < TW.fy + 3); p.speed = 55; p.dir = 3;
+      this.tw = { m: { look: G.LOOKS.fd_bubble_m, x: TW.x, y: TW.my, dir: 0, frame: 0, kind: 'ped' }, f: { look: G.LOOKS.fd_bubble_f, x: TW.x, y: TW.fy, dir: 0, frame: 0, kind: 'ped' }, i: 0, t: 2 };
       this.bar = { look: G.LOOKS.fd_bar, x: 3 * TS + 8, y: 3 * TS + 14, dir: 0, frame: 0, kind: 'ped', path: [], wait: 1 };
       this.host = { look: G.LOOKS.fd_host, x: 13 * TS + 8, y: 12 * TS + 12, dir: 0, frame: 0, kind: 'ped', path: [] };
       this.waiters = [noId(G.LOOKS.fd_waiter1, { held: 'tray' }), noId(G.LOOKS.fd_waiter2, { held: 'tray' })].map((l, i) => ({
@@ -399,6 +427,13 @@
         const cs = this.tables.filter(t => t.a && t.b && t.angry <= 0);
         if (cs.length) { const t = G.pick(cs); if (G.chance(0.45)) t.heartT = 2.5; else G.ui.bubble(G.pick(CHAT), G.pick([t.a, t.b]), 2.2); }
       }
+      // twerk corner: his lines in order, then a breather; only while you are around to hear it
+      { const w = this.tw; w.t -= dt;
+        if (w.t <= 0) {
+          const near = Math.hypot(this.player.x - TW.x, this.player.y - TW.fy) < 120;
+          if (near) { const [k, s] = BUBBLE[w.i]; this.say(k, s, w.m, 1.9); w.i = (w.i + 1) % BUBBLE.length; w.t = w.i === 0 ? G.rand(6, 9) : 2.1; }
+          else w.t = 1;
+        } }
       // staff
       const b = this.bar;
       if (follow(b, 14, dt)) { b.dir = 0; b.wait -= dt; if (b.wait <= 0) { b.wait = G.rand(1.5, 4); b.path = [[G.randi(1, 6) * TS + 8, b.y]]; } }
@@ -450,9 +485,11 @@
       ctx.drawImage(this.bg, Math.round(-cx * rs) / rs, Math.round(-cy * rs) / rs, RW, RH);
       // people by depth
       const ppl = this.all().filter(o => !o.dead && o !== this.player);
-      ppl.push(this.player);
+      ppl.push(this.player, this.tw.m, this.tw.f);
       ppl.sort((a, b) => a.y - b.y).forEach(o => {
         if (o === this.player) o.draw(ctx, cx, cy);
+        else if (o === this.tw.m) drawStoolGuy(ctx, o, cx, cy);
+        else if (o === this.tw.f) drawTwerk(ctx, o, cx, cy);
         else G.drawPerson(ctx, o.look, o.x - cx, o.y - cy, o.dir, o.frame || 0);
       });
       // hearts / anger above tables

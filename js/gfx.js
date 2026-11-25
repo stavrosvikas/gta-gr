@@ -608,6 +608,8 @@
     shepherd:  { skin: '#c98c62', hair: '#555', hairStyle: 'short', top: '#2a2a33', topStyle: 'jacket', legs: '#2a2a2a', acc: ['beanie:#1e1e1e', 'mustache'], held: 'stick' },
     fd_bar:    { skin: '#d9a27a', hair: '#2a1d16', hairStyle: 'curly', top: '#f4f4f4', top2: '#111', topStyle: 'vest', legs: '#111', acc: ['beard'] },
     fd_host:   { skin: '#f0c8a8', hair: '#121212', hairStyle: 'long', top: '#f4f4f4', topStyle: 'shirt', top2: '#f4f4f4', legs: '#151515', skirt: true, acc: ['lipstick', 'gold'], female: true },
+    fd_bubble_m: { skin: '#e2b48e', hair: '#e8d6a6', hairStyle: 'buzz', top: '#141414', topStyle: 'tshirt', legs: '#161616', acc: ['beard:#2a1d16', 'chain', 'tattoo', 'muscles'] },
+    fd_bubble_f: { skin: '#f4d6c2', hair: '#efe8d8', hairStyle: 'bob', top: '#121214', topStyle: 'tank', legs: '#121214', shoes: '#111', acc: ['crossNeck', 'tattoo', 'leather', 'lipstick', 'earrings'], female: true },
     fd_waiter1:{ skin: '#e0b090', hair: '#6a6a66', hairStyle: 'bald', top: '#f4f4f4', top2: '#111', topStyle: 'vest', legs: '#111', acc: ['beardGrey'] },
     fd_waiter2:{ skin: '#f0c8a8', hair: '#3a2014', hairStyle: 'curly_long', top: '#f4f4f4', topStyle: 'shirt', top2: '#111', legs: '#151515', skirt: true, acc: ['lipstick'], female: true },
     ferrari_lady: { skin: '#f0c8a8', hair: '#f3dd8a', hairStyle: 'long', top: '#ff6fa3', topStyle: 'shirt', top2: '#fff', legs: '#111', skirt: true, acc: ['shades', 'gold', 'lipstick'], female: true },

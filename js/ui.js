@@ -287,7 +287,7 @@
     if (!mob && scene === G.worldScene) {
       const v = G.player.vehicle;
       const keys = v ? [['R', 'Ραδιόφωνο ' + (st.radioOn ? 'ON' : 'OFF')], ['SPACE', 'Χειρόφρενο'], ['E', 'Βγες'], ['M', 'Χάρτης']]
-        : [['SPACE', 'Χτύπα'], ['E', 'Μπες / μίλα'], ['M', 'Χάρτης']];
+        : [['SPACE', 'Χτύπα'], ['E', 'Μπες / αποστολή'], ['M', 'Χάρτης']];
       if (v && v.two) keys.shift(); // no radio on two wheels
       keys.forEach(([k, label], i) => {
         const y = G.H - 32 - (keys.length - 1 - i) * 13; c.globalAlpha = 0.85;

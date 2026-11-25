@@ -7,8 +7,8 @@
     G.audio.radio(false);
     if (fresh) {
       G.ui.toast(G.device === 'mobile' ? 'Joystick = κίνηση · ΜΠΕΣ = αμάξι/αποστολή · MAP = χάρτης' : 'Βελάκια/WASD κίνηση · SPACE χτύπα · E μπες/αποστολή · R ραδιόφωνο στο αμάξι · M χάρτης', 7);
-      G.worldScene.availSteps().forEach((st, i) => setTimeout(() => G.worldScene.phone(st), 1500 + i * 2200));
-    } else G.worldScene.availSteps().forEach((st, i) => setTimeout(() => G.worldScene.phone(st), 800 + i * 2200));
+      G.worldScene.smsQueue = []; G.worldScene.queuePhone(G.worldScene.availSteps(), 4);
+    } else { G.worldScene.smsQueue = []; G.worldScene.queuePhone(G.worldScene.availSteps(), 3); }
   };
 
   function boot() {

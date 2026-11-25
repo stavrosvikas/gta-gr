@@ -1353,6 +1353,7 @@
 
   // ---------- pedestrians (few, all different) ----------
   const pedWalk = (x, y) => { const c = Wd.get(x, y); return (c === '.' || c === 'S' || c === 'p' || c === 'w') && !Wd.propAt(x, y); };
+  S.pedWalk = (tx, ty) => pedWalk(tx, ty);
   S.spawnPed = function (px, py) {
     for (let i = 0; i < 20; i++) {
       const a = Math.random() * 6.283, d = G.rand(15, 24);

@@ -56,13 +56,30 @@
   WS.resume = function () {
     G.player.look = G.state.look;
     const before = (WS.lastStep || '').split(','); WS.refreshMarkers();
-    WS.availSteps().filter(s => !before.includes(s.id)).forEach((s, i) => setTimeout(() => WS.phone(s), i * 2200));
+    WS.queuePhone(WS.availSteps().filter(s => !before.includes(s.id)), 3);
   };
 
   // ---------- phone (GTA-style message) ----------
   WS.phone = function (step) {
     if (!step) return;
     G.sms(step.sms); WS.phoneMsg = { text: step.sms, t: 8 }; G.audio.sfx('good');
+    (G.state.smsSent = G.state.smsSent || {})[step.id] = true;
+  };
+  // messages come one at a time, in story order, with a long gap between them (never a pile-up on entering).
+  // Every available mission still has its marker on the map, so you can find and start one before its message.
+  WS.smsQueue = []; WS.smsGap = 0;
+  WS.queuePhone = function (steps, firstIn = 2) {
+    const sent = G.state.smsSent || {};
+    const had = s => sent[s.id] || (G.state.sms || []).some(m => m.text === s.sms); // older saves: already in the inbox
+    for (const s of steps) if (s && !had(s) && !WS.smsQueue.includes(s)) WS.smsQueue.push(s);
+    if (WS.smsQueue.length) WS.smsGap = Math.min(WS.smsGap || firstIn, firstIn);
+  };
+  WS.tickPhone = function (dt) {
+    if (!WS.smsQueue.length || WS.phoneMsg) return;
+    WS.smsGap -= dt; if (WS.smsGap > 0) return;
+    const s = WS.smsQueue.shift();
+    if (!G.state.done[s.id] && WS.availSteps().includes(s)) WS.phone(s);
+    WS.smsGap = 45; // next one after a while of free roaming
   };
 
   // fixed NPCs: school interview
@@ -328,6 +345,7 @@
     const pl = G.player, st = G.state;
     st.playTime += dt; WS.hint = null;
     if (WS.phoneMsg) { WS.phoneMsg.t -= dt; if (WS.phoneMsg.t <= 0) WS.phoneMsg = null; }
+    WS.tickPhone(dt);
     const top = [{ id: 'phone', label: '📱', pos: [G.W - 124, 22], r: 12 }, { id: 'map', label: 'MAP', pos: [G.W - 152, 22], r: 12 }, { id: 'pause', label: '❚❚', pos: [G.W - 180, 22], r: 12 }];
     const btns = pl.vehicle ? [{ id: 'enter', label: 'ΒΓΕΣ' }, { id: 'radio', label: '📻' }, ...top]
       : [{ id: 'enter', label: 'ΜΠΕΣ' }, { id: 'action', label: 'ΧΤΥΠΑ' }, ...top];
@@ -421,9 +439,20 @@
     pl.punchT -= dt;
     if (G.pressed('action') && pl.punchT <= 0 && !G.bballHolding) {
       pl.punchT = 0.4; const fx = [0, -1, 1, 0][pl.dir], fy = [1, 0, 0, -1][pl.dir];
+      const hx = pl.x + fx * 8, hy = pl.y + fy * 6;
+      // people queuing at a bus stop are drawn with the shelter: the one you hit steps out as a real pedestrian
+      for (const sp of Wd.stops || []) {
+        if (Math.abs(sp.tx * TS + 8 - hx) > 40 || Math.abs(sp.ty * TS + 14 - hy) > 40) continue;
+        const m = sp.crowd.find(m => !m.gone && G.dist(sp.tx * TS + 8 + m.dx, sp.ty * TS + 14 + m.dy, hx, hy) < 11);
+        if (!m) continue;
+        const p = new G.Ent.Person(m.look || G.randomLook(), sp.tx * TS + 8 + m.dx, sp.ty * TS + 14 + m.dy);
+        p.speed = G.rand(16, 26); if (S.pedWalk) p.walk = S.pedWalk; p.dir = m.dir || 0; S.peds.push(p);
+        m.gone = true; m.back = G.t + 40; // someone else takes the spot a bit later
+        break;
+      }
       for (const p of S.peds) {
         if (p.down > 0 || p.invuln || p.cameo) continue;
-        if (G.dist(p.x, p.y, pl.x + fx * 8, pl.y + fy * 6) < 11) {
+        if (G.dist(p.x, p.y, hx, hy) < 11) {
           p.knock(fx, fy, 70); G.audio.sfx('punch');
           if (!p.cop && !p.robbed && !p.fixed) { p.robbed = true; const n = 1 + (G.chance(0.4) ? 1 : 0); for (let k = 0; k < n; k++) WS.drops.push({ x: p.x + G.rand(-8, 8), y: p.y + G.rand(-2, 8), v: Math.round(G.rand(3, 25)), t: 0 }); }
           if (p.cop) S.addWanted(2, 'Έσπρωξες αστυνομικό!'); else S.crime(1, 'Σε είδαν να σπρώχνεις κόσμο!', p.x, p.y);
@@ -465,7 +494,19 @@
   WS.sound = function (dt) {
     const pl = G.player, me = pl.vehicle || pl, A = G.audio;
     A.engines(me.x, me.y, S.vehicles, pl.vehicle);
-    A.ambience('loop_city', pl.vehicle ? 0.07 : 0.11);
+    // city bed, layered so Athens sounds full: real Athens crossroad traffic + scooters/horns/voices,
+    // and people walking/talking that swells with the crowd around you. Quieter inside a car, gone outside town.
+    const town = Wd.area(Math.floor(me.x / TS), Math.floor(me.y / TS)) === 'town', car = !!pl.vehicle;
+    if (town) {
+      let crowd = 0; for (const p of S.peds) if (Math.abs(p.x - me.x) < 220 && Math.abs(p.y - me.y) < 160) crowd++;
+      A.loop('amb', 'loop_city', car ? 0.3 : 0.5);
+      A.loop('amb2', 'loop_city2', car ? 0.16 : 0.28);
+      A.loop('walla', 'loop_walla', (car ? 0.06 : 0.14) + Math.min(0.3, crowd * 0.035) * (car ? 0.4 : 1));
+      WS.hornT = (WS.hornT == null ? G.rand(5, 10) : WS.hornT) - dt;
+      if (WS.hornT <= 0) { WS.hornT = G.rand(9, 20); A.sfx('horns_far', car ? 0.2 : 0.32, G.rand(-0.8, 0.8)); }
+      WS.farSirenT = (WS.farSirenT == null ? G.rand(40, 70) : WS.farSirenT) - dt;
+      if (WS.farSirenT <= 0) { WS.farSirenT = G.rand(60, 120); if (!G.state.wanted) A.sfx('siren', 0.12, G.rand(-0.9, 0.9)); }
+    }
     WS.dogT = (WS.dogT == null ? G.rand(4, 9) : WS.dogT) - dt;
     if (WS.dogT <= 0) {
       const a = Math.random() * 6.28, r = G.rand(140, 380), n = G.chance(0.4) ? 2 : 1;

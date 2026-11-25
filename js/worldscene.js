@@ -215,7 +215,7 @@
     const wake = [];
     if (G.player.vehicle) WS.exitVehicle();
     G.push({
-      enter() { this.s = 0; this.t = 0; this.ang = posAt(0).a; WS.riding = true; G.audio.radio(false); G.audio.sfx(o.kind === 'train' ? 'train_horn' : o.kind === 'heli' ? 'heli' : 'boat_horn'); },
+      enter() { this.s = 0; this.t = 0; this.ang = posAt(0).a; WS.riding = true; G.audio.radio(false); G.cameos && G.cameos.depart(o); G.audio.sfx(o.kind === 'train' ? 'train_horn' : o.kind === 'heli' ? 'heli' : 'boat_horn'); },
       update(dt) {
         this.t += dt;
         U.setMobile([{ id: 'ok', label: '⏩' }], 'none');
@@ -235,6 +235,7 @@
           const e = o.end; WS.placePlayer(e[0] * TS + 8, e[1] * TS + 10); G.player.dir = 0;
           U.toast('Καλώς ήρθες: ' + o.to, 2.5); G.audio.sfx('door'); WS.refreshMarkers();
           if (o.kind === 'heli' && o.to === 'ΜΗΛΟΣ') WS.panicLanding(e[0] * TS + 8, e[1] * TS + 10);
+          G.cameos && G.cameos.arrive(o, e[0] * TS + 8, e[1] * TS + 10);
         }
       },
       render(ctx) {
@@ -252,6 +253,7 @@
         const f = G.clamp(this.s / L, 0, 1), bw = 140, bx = G.W / 2 - bw / 2, by = G.H - 26;
         U.rr(bx, by, bw, 7, 3.5, 'rgba(16,13,28,0.85)', U.T.line); U.rr(bx + 1.5, by + 1.5, Math.max(4, (bw - 3) * f), 4, 2, U.T.gold);
         U.text(G.W / 2, G.H - 8, G.device === 'mobile' ? 'Κράτα ⏩ για γρηγορότερα' : 'Κράτα ENTER για γρηγορότερα', 7.5, '#fff', 'center');
+        U.drawBubbles(camX, camY); // e.g. someone shouting from the pier as you leave
         U.drawOverlays(); U.drawMobile();
       },
     });

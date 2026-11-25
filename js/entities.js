@@ -1404,7 +1404,7 @@
   S.addWanted = function (n, why) {
     const st = G.state, before = st.wanted;
     st.wanted = G.clamp(st.wanted + n, 0, 5); S.wantedCool = 0;
-    if (st.wanted > before) { G.audio.sfx('star'); if (why) G.ui.toast(why); if (before === 0) S.patrolDelay = G.rand(4, 7); }
+    if (st.wanted > before) { G.audio.sfx('star'); if (why) G.ui.toast(why); if (st.wanted === 5 && before < 5) G.ui.toast('🚨 5 ΑΣΤΕΡΙΑ: όλη η Αττική σε ψάχνει. Φύγε με αμάξι!', 3); if (before === 0) S.patrolDelay = G.rand(4, 7); }
   };
   // patrol cars come from far away along the roads
   S.spawnPatrol = function () {
@@ -1420,7 +1420,7 @@
     S.vehicles.push(v); G.audio.sfx('siren');
   };
   function copOnFoot(x, y, kind, car) {
-    const c = new E.Person(kind === 'lera' ? G.LOOKS.cop_lera : G.LOOKS.cop_agapi, x, y); c.cop = kind; c.speed = 52; c.said = 0; c.timer = 0; c.car = car;
+    const c = new E.Person(kind === 'lera' ? G.LOOKS.cop_lera : G.LOOKS.cop_agapi, x, y); c.cop = kind; c.speed = 52 + Math.max(0, G.state.wanted - 2) * 3; c.said = 0; c.timer = 0; c.car = car;
     S.peds.push(c); S.cops.push(c); return c;
   }
   function patrolAI(v, dt) {
@@ -1481,7 +1481,11 @@
     const stopAt = pl.vehicle ? Math.max(pl.vehicle.wid / 2 + 10, Math.min(pl.vehicle.len / 2 + 5, 26)) : 9;
     if (d > stopAt) { if (!c.move(Math.cos(a) * c.speed, Math.sin(a) * c.speed, dt)) c.move(Math.cos(a + 1.4) * c.speed, Math.sin(a + 1.4) * c.speed, dt); }
     else { c.move(0, 0, dt); c.dir = Math.abs(Math.cos(a)) > Math.abs(Math.sin(a)) ? (Math.cos(a) > 0 ? 2 : 1) : (Math.sin(a) > 0 ? 0 : 3); }
-    c.said -= dt;
+    c.said -= dt; c.hitCd = (c.hitCd || 0) - dt;
+    if (G.state.wanted >= 4 && !pl.vehicle && d < 13 && c.down <= 0 && c.hitCd <= 0) {
+      c.hitCd = G.state.wanted >= 5 ? 1.1 : 1.6; G.audio.sfx('punch');
+      G.worldScene.damage(G.state.wanted >= 5 ? 7 : 5);
+    }
     if (c.cop === 'lera' && d < 90 && c.said < 0) { G.audio.say('cop_lera', 'Λέρα! Μεγάλη λέρα!', c); c.said = 8; }
   }
   // arrest: a cop must stay next to you while you're (almost) still, for a moment
@@ -1490,7 +1494,7 @@
     const speed = pl.vehicle ? Math.abs(pl.vehicle.speed) : Math.hypot(G.input.axis.x, G.input.axis.y) * pl.speed;
     const reach = pl.vehicle ? pl.vehicle.wid / 2 + 16 : 14;
     const near = S.cops.find(c => !c.returning && c.down <= 0 && G.dist(c.x, c.y, tgt.x, tgt.y) < reach);
-    if (near && speed < (pl.vehicle ? 25 : 30)) S.arrest = Math.min(1, (S.arrest || 0) + dt / 1.6);
+    if (near && speed < (pl.vehicle ? 25 : 30)) S.arrest = Math.min(1, (S.arrest || 0) + dt / (1.6 - Math.max(0, G.state.wanted - 2) * 0.17));
     else S.arrest = Math.max(0, (S.arrest || 0) - dt * 0.8);
     if (S.arrest >= 1 && G.top() === G.worldScene && !G.worldScene.busted) {
       S.arrest = 0;
@@ -1804,7 +1808,7 @@
     if (w > 0) {
       S.wantedCool += dt; S.patrolDelay = (S.patrolDelay || 0) - dt;
       const patrols = S.vehicles.filter(v => v.chase).length;
-      if (S.patrolDelay <= 0 && patrols < (w >= 3 ? 2 : 1)) { S.spawnPatrol(); S.patrolDelay = 10; }
+      if (S.patrolDelay <= 0 && patrols < (w >= 5 ? 4 : w >= 4 ? 3 : w >= 3 ? 2 : 1)) { S.spawnPatrol(); S.patrolDelay = Math.max(3.5, 11 - w * 1.5); }
       const seen = S.cops.some(c => !c.returning && G.dist(c.x, c.y, pp.x, pp.y) < 160) || S.vehicles.some(v => v.chase && G.dist(v.x, v.y, pp.x, pp.y) < 240);
       if (seen) S.wantedCool = 0;
       if (S.wantedCool > 7 + w * 2) { G.state.wanted = w - 1; S.wantedCool = 0; if (G.state.wanted === 0) G.ui.toast('Σε έχασαν. Ησύχασε.'); }

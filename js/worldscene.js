@@ -453,7 +453,14 @@
       for (const p of S.peds) {
         if (p.down > 0 || p.invuln || p.cameo) continue;
         if (G.dist(p.x, p.y, hx, hy) < 11) {
-          p.knock(fx, fy, 70); G.audio.sfx('punch');
+          // at 4-5 stars the cops are tougher: they shrug off the first punches and get up sooner
+          const w = G.state.wanted, need = !p.cop ? 1 : w >= 5 ? 3 : w >= 4 ? 2 : 1;
+          if ((p.hits = (p.hits || 0) + 1) < need) {
+            p.move(fx * 160, fy * 160, 0.03); G.audio.sfx('punch', 0.5);
+            G.audio.say('cop_shrug', G.pick(['Αυτό ήταν;', 'Γαργαλάει!', 'Με χάιδεψες;']), p, 1.2); break;
+          }
+          p.hits = 0;
+          p.knock(fx, fy, 70); G.audio.sfx('punch'); if (p.cop && w >= 4) p.down *= 0.45;
           if (!p.cop && !p.robbed && !p.fixed) { p.robbed = true; const n = 1 + (G.chance(0.4) ? 1 : 0); for (let k = 0; k < n; k++) WS.drops.push({ x: p.x + G.rand(-8, 8), y: p.y + G.rand(-2, 8), v: Math.round(G.rand(3, 25)), t: 0 }); }
           if (p.cop) S.addWanted(2, 'Έσπρωξες αστυνομικό!'); else S.crime(1, 'Σε είδαν να σπρώχνεις κόσμο!', p.x, p.y);
           G.audio.say('ped_hit', G.pick(['Αστυνομίαααα!', 'Τι κάνεις ρε;', 'Θα σε πάρω βίντεο!']), p, 1.6);

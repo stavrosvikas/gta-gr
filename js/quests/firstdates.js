@@ -42,12 +42,10 @@
     ['fd_bar_drink2', 'Πάρε αυτό. Θάρρος σε ποτήρι.'],
     ['fd_bar_drink3', 'Κι άλλο; Ποιον περιμένεις, φίλε μου;'],
   ];
-  // the couple in the free corner: she twerks, he cheers her on from his stool (voice files: vo_fd_bubble_1..4)
+  // the couple in the free corner: she twerks, he cheers her on from his stool (voice files: vo_fd_bubble_1..2)
   const BUBBLE = [
-    ['fd_bubble_1', 'Bubble butttt!'],
-    ['fd_bubble_2', 'Bubble bubble!'],
-    ['fd_bubble_3', 'Bubble butttt!'],
-    ['fd_bubble_4', 'Υπάρχει θέληση εδώ πέρα!'],
+    ['fd_bubble_1', 'Bubble butt, bubble, bubble, bubble butt!'],
+    ['fd_bubble_2', 'Υπάρχει θέληση εδώ, υπάρχει θέληση!'],
   ];
   const TW = { x: 17 * 16 + 4, my: 5 * 16 + 10, fy: 6 * 16 + 15 }; // his stool, her spot just in front of him
   const HOST_TALK = [
@@ -431,7 +429,7 @@
       { const w = this.tw; w.t -= dt;
         if (w.t <= 0) {
           const near = Math.hypot(this.player.x - TW.x, this.player.y - TW.fy) < 120;
-          if (near) { const [k, s] = BUBBLE[w.i]; this.say(k, s, w.m, 1.9); w.i = (w.i + 1) % BUBBLE.length; w.t = w.i === 0 ? G.rand(6, 9) : 2.1; }
+          if (near) { const [k, s] = BUBBLE[w.i]; this.say(k, s, w.m, 2.3); w.i = (w.i + 1) % BUBBLE.length; w.t = w.i === 0 ? G.rand(6, 9) : 2.6; }
           else w.t = 1;
         } }
       // staff

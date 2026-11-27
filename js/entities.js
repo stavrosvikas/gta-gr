@@ -26,6 +26,7 @@
     ferrari: { max: 368, acc: 400, turn: 3.1, grip: 8 },
     tincan:  { max: 176, acc: 144, turn: 2.4, grip: 3.5 },
     van:     { max: 192, acc: 160, turn: 2.2, grip: 6 },
+    ambulance: { max: 230, acc: 190, turn: 2.3, grip: 6 },
     pickup:  { max: 200, acc: 176, turn: 2.3, grip: 5 },
     sheeptruck: { max: 168, acc: 128, turn: 2.1, grip: 5 },
     bus:     { max: 152, acc: 96, turn: 1.6, grip: 8 },
@@ -159,7 +160,7 @@
       }
       const dl = this.hp >= 100 ? 0 : this.wrecked ? 4 : this.hp > 80 ? 0 : this.hp > 55 ? 1 : this.hp > 30 ? 2 : 3;
       const dmg = dl ? { l: dl, z: this.dmgZ || 1, s: this.uid % 3 } : null;
-      G.drawVehicle(ctx, this.type, this.col, this.x - camX, this.y - camY, this.a, this.wrecked ? null : (this.type === 'police' && this.siren) || this.type === 'dias' ? 'siren' : this.type === 'garbage' ? 'beacon' : null, dmg);
+      G.drawVehicle(ctx, this.type, this.col, this.x - camX, this.y - camY, this.a, this.wrecked ? null : ((this.type === 'police' || this.type === 'ambulance') && this.siren) || this.type === 'dias' ? 'siren' : this.type === 'garbage' ? 'beacon' : null, dmg);
       if (this.type === 'garbage') drawGarbageCrew(ctx, this, camX, camY);
     }
   };
@@ -868,7 +869,7 @@
   S.separate = separate;
 
   // ================= CRASH PHYSICS: impacts, dents, knockable props, never stuck =================
-  const MASS = { bus: 10, truck: 12, garbage: 11, sheeptruck: 6, van: 2.4, pickup: 2.2, suv: 1.7, sedan: 1.45, car: 1.3, city: 1.25, taxi: 1.35, police: 1.4, ferrari: 1.3, mini: 1.05, smart: 0.9, tincan: 1, moto: 0.35, dias: 0.4, bike: 0.2, scooter: 0.2, heli: 50 };
+  const MASS = { bus: 10, truck: 12, garbage: 11, sheeptruck: 6, van: 2.4, ambulance: 2.5, pickup: 2.2, suv: 1.7, sedan: 1.45, car: 1.3, city: 1.25, taxi: 1.35, police: 1.4, ferrari: 1.3, mini: 1.05, smart: 0.9, tincan: 1, moto: 0.35, dias: 0.4, bike: 0.2, scooter: 0.2, heli: 50 };
   const massOf = v => MASS[v.type] || 1.3;
   E.massOf = massOf;
   const DIRS16 = Array.from({ length: 16 }, (_, i) => [Math.cos(i * Math.PI / 8), Math.sin(i * Math.PI / 8)]);
@@ -1502,7 +1503,7 @@
       c.hitCd = G.state.wanted >= 5 ? 1.1 : 1.6; G.audio.sfx('punch');
       G.worldScene.damage(G.state.wanted >= 5 ? 7 : 5);
     }
-    if (c.cop === 'lera' && d < 90 && c.said < 0) { G.audio.say('cop_lera', 'Λέρα! Μεγάλη λέρα!', c); c.said = 8; }
+    if (c.cop === 'lera' && d < 90 && c.said < 0) { G.audio.say('cop_lera', 'Μεγάλο λαμόγιο… λέρα!', c); c.said = 8; }
   }
   // arrest: a cop must stay next to you while you're (almost) still, for a moment
   function arrestCheck(dt) {
@@ -1514,7 +1515,7 @@
     else S.arrest = Math.max(0, (S.arrest || 0) - dt * 0.8);
     if (S.arrest >= 1 && G.top() === G.worldScene && !G.worldScene.busted) {
       S.arrest = 0;
-      if (near.cop === 'agapi') G.audio.say('cop_agapi', 'Αγάπη μόνο!', near, 2); else G.audio.say('cop_lera', 'Λέρα! Μεγάλη λέρα!', near, 2);
+      if (near.cop === 'agapi') G.audio.say('cop_agapi', 'Αγάπη μόνο!', near, 2); else G.audio.say('cop_lera', 'Μεγάλο λαμόγιο… λέρα!', near, 2);
       G.worldScene.bust();
     }
   }

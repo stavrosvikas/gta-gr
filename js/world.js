@@ -200,6 +200,11 @@
       B({ type: 'house', x: hx, y: 41, w: 5, h: 4, roof: rf, wall: '#f0e2c4' });
       for (let y = 45; y <= 46; y++) for (const xx of [hx + 2, hx + 3]) set(xx, y, 'p');
     }
+    // hospital by the first signpost: building x103-111 y38-42, paved yard in front down to the εθνική (cameos.js puts the people in it)
+    B({ id: 'hospital', type: 'hospital', x: 103, y: 38, w: 9, h: 5, label: 'ΝΟΣΟΚΟΜΕΙΟ', roof: '#d8dce4', wall: '#f4f6fa',
+      face: { kind: 'board', board: '#ffffff', frame: '#d62828', text: '#d62828' } });
+    for (let y = 43; y <= 46; y++) for (let x = 101; x <= 113; x++) set(x, y, 'p');
+    W.HOSPITAL = { x: 103, y: 38, w: 9, h: 5, yard: { x: 101, y: 43, w: 13, h: 4 } };
     // countryside landmarks (drawn in genProps): windmill, roadside chapel, tractor, hay bales, εικονοστάσια
     W.LANDMARKS = [{ k: 'windmill', x: 190, y: 43 }, { k: 'chapel', x: 172, y: 43 }, { k: 'tractor', x: 106, y: 59 },
       { k: 'shrine', x: 118, y: 46 }, { k: 'shrine', x: 213, y: 53 },
@@ -249,9 +254,9 @@
     rect(12, 20, 12, 1, 'S');
     // ---- N: hipster street (block x31-57, y11-21) ----
     rect(31, 11, 27, 11, 'p'); rect(31, 18, 27, 4, 'S');
-    B({ id: 'avocado', type: 'shop', x: 31, y: 12, w: 6, h: 6, label: 'AVOCADO BAR', roof: '#5c9741', wall: '#f2e1c8', awning: '#5c9741', deco: 'avocado' });
-    B({ id: 'coffee', type: 'shop', x: 38, y: 11, w: 6, h: 6, label: 'FREDDOCINO ΜΠΑΝΑΝΑ', roof: '#c9a46a', wall: '#fff6e0', awning: '#7a4a25', deco: 'coffee' });
-    B({ id: 'plants', type: 'shop', x: 45, y: 12, w: 5, h: 6, label: 'ΦΥΤΑ & ΨΥΧΗ', roof: '#2f6b3a', wall: '#e4f0d8', awning: '#3a8a4a', deco: 'plants' });
+    B({ id: 'avocado', type: 'shop', x: 31, y: 12, w: 6, h: 6, label: 'ΑΒΟΚΑΝΤΟ ΘΑΥΜΑ ΣΟΥ', roof: '#5c9741', wall: '#f2e1c8', awning: '#5c9741', deco: 'avocado' });
+    B({ id: 'coffee', type: 'shop', x: 38, y: 11, w: 6, h: 6, label: 'ΟΙ 3 ΜΠΑΡΙΣΤΑ', roof: '#c9a46a', wall: '#fff6e0', awning: '#7a4a25', deco: 'coffee' });
+    B({ id: 'plants', type: 'shop', x: 45, y: 12, w: 5, h: 6, label: 'ΦΙΚΕΑ', roof: '#2f6b3a', wall: '#e4f0d8', awning: '#3a8a4a', deco: 'plants' });
     B({ id: 'toys', type: 'shop', x: 51, y: 11, w: 6, h: 6, label: 'ADULT TOYS 18+', roof: '#2a1a2a', wall: '#1d1d1d', awning: '#ff6fa3', deco: 'dildo' });
     // ---- NE: graffiti district + school (block x63-89, y11-21) ----
     rect(63, 11, 27, 11, 'p');
@@ -964,14 +969,14 @@
   function paintBuilding(x, b) {
     const w = b.w * TS, h = b.h * TS;
     const P = (a, c, ww, hh, col) => { x.fillStyle = col; x.fillRect(a, c, ww, hh); };
-    const flatRoof = ['apart', 'bank', 'police', 'tax', 'parliament'].includes(b.type);
+    const flatRoof = ['apart', 'bank', 'police', 'tax', 'parliament', 'hospital'].includes(b.type);
     const roof = G.shade(b.roof, flatRoof ? -0.42 : -0.12), roofD = G.shade(roof, -0.25), roofL = G.shade(roof, 0.18), wall = G.shade(b.wall, -0.12), wallD = G.shade(wall, -0.2);
     const tall = b.type === 'apart' ? 0.62 : b.type === 'parliament' ? 0.55 : 0.45; // fraction of height that is wall
     const wallH = Math.round(h * tall / 8) * 8, roofH = h - wallH;
     // wall
     P(0, roofH, w, wallH, wall); P(0, h - 3, w, 3, wallD); P(0, roofH, 2, wallH, wallD); P(w - 2, roofH, 2, wallH, wallD);
     // roof
-    if (b.type === 'apart' || b.type === 'bank' || b.type === 'police' || b.type === 'tax' || b.type === 'parliament') {
+    if (flatRoof) {
       // flat roof with parapet
       P(0, 0, w, roofH, roof); P(0, 0, w, 3, roofL); P(0, roofH - 3, w, 3, roofD); P(0, 0, 3, roofH, roofL); P(w - 3, 0, 3, roofH, roofD);
       if (b.type === 'apart') { // ταράτσα: ηλιακοί, κεραίες, δεξαμενή, πιάτο, κλιματιστικά, σκοινί με ρούχα
@@ -992,6 +997,12 @@
         P(16, roofH - 20, w - 50 > 10 ? w - 50 : 10, 1, '#999'); for (let i = 0; i < 4; i++) P(18 + i * 6, roofH - 19, 3, 4, ['#e44', '#fff', '#4a8', '#48f'][i]);
       }
       if (b.type === 'parliament') { P(w / 2 - 1, -0, 2, 14, '#fff'); }
+      if (b.type === 'hospital') { // helipad H on the roof + a red cross, AC units
+        const hx = 26, hy = roofH / 2; x.fillStyle = '#5a6070'; x.beginPath(); x.arc(hx, hy, 14, 0, 7); x.fill(); x.strokeStyle = '#ffd400'; x.lineWidth = 1.2; x.beginPath(); x.arc(hx, hy, 12, 0, 7); x.stroke();
+        P(hx - 6, hy - 6, 2.4, 12, '#fff'); P(hx + 3.6, hy - 6, 2.4, 12, '#fff'); P(hx - 4, hy - 1.2, 8, 2.4, '#fff');
+        P(w - 40, hy - 9, 8, 18, '#e23a3a'); P(w - 45, hy - 4, 18, 8, '#e23a3a');
+        for (let i = 0; i < 3; i++) { P(w - 22, 6 + i * 9, 12, 6, '#dcdcdc'); P(w - 21, 7 + i * 9, 10, 1, '#aaa'); }
+      }
     } else {
       // pitched roof
       P(0, 0, w, roofH, roof);
@@ -1019,13 +1030,18 @@
       }
     } else if (b.type === 'parliament') {
       for (let wx = 10; wx < w - 14; wx += 18) { win(wx, winY0, 10, 12); win(wx, winY0 + 18, 10, 12); }
+    } else if (b.type === 'hospital') {
+      const dxh = (b.door[0] - b.x) * TS;
+      for (let wx = 6; wx < w - 10; wx += 14) if (Math.abs(wx + 5 - dxh - 8) > 16) win(wx, winY0, 10, 9);
+      P(dxh - 10, h - 21, 36, 4, '#e23a3a'); P(dxh - 10, h - 17, 36, 1, '#a82020');   // ΤΕΠ canopy over the entrance
+      x.fillStyle = '#fff'; x.font = 'bold 3.4px sans-serif'; x.textAlign = 'center'; x.fillText('ΤΕΠ', dxh + 8, h - 17.9);
     } else {
       win(6, winY0); win(w - 14, winY0);
     }
     // door
     const dx = (b.door[0] - b.x) * TS;
     if (b.type === 'parliament') { P(dx - 8, h - 20, 32, 20, '#6b4a2b'); P(dx - 6, h - 18, 28, 18, '#8b6a3b'); }
-    else { P(dx + 2, h - 15, 12, 15, '#5a3a20'); P(dx + 3, h - 14, 10, 14, ['shop', 'firstdates', 'bank'].includes(b.type) ? '#a8d8f0' : '#8b5a2b'); P(dx + 3, h - 14, 10, 1, '#333'); }
+    else { P(dx + 2, h - 15, 12, 15, '#5a3a20'); P(dx + 3, h - 14, 10, 14, ['shop', 'firstdates', 'bank', 'hospital'].includes(b.type) ? '#a8d8f0' : '#8b5a2b'); P(dx + 3, h - 14, 10, 1, '#333'); }
     // awnings / decos for shops
     if (b.awning) { for (let i = 0; i < w; i += 6) { P(i, roofH, 3, 5, b.awning); P(i + 3, roofH, 3, 5, '#fff'); } }
     if (b.deco === 'avocado') { P(8, h - 14, 6, 8, '#3a7a2a'); P(9, h - 12, 4, 4, '#c8e070'); P(10, h - 11, 2, 2, '#7a4a25'); }

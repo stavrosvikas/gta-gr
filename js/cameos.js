@@ -4,14 +4,17 @@
 //   serres: a man on the platform who greets the arriving train with one word
 //   port:   a fan in a yellow-black scarf who shouts when the ship leaves
 //   εθνική: a small excavation (one column) in the fields by the road out of town, two ladies arguing next to it
-// VOICE KEYS (optional files, bubbles always show): vo_cam_onfire, vo_cam_pilot, vo_cam_telos, vo_cam_venga, vo_cam_millions
+//   hospital (by the first signpost on the εθνική): a man in a suit jumps and claps chanting, two bodyguards beside him,
+//           two doctors around him, two passers-by staring; after each chant someone goes «ΟΥΟΥΟΥ»; ambulance parked in the yard
+// VOICE KEYS (optional files, bubbles always show): vo_cam_onfire, vo_cam_pilot, vo_cam_telos, vo_cam_venga, vo_cam_millions, vo_cam_dap (+ reuses vo_pitch_ouou)
 'use strict';
 (function () {
   const TS = G.TS || 16;
   const INK = 'rgba(28,20,36,0.85)', SHADOW = 'rgba(20,10,30,0.28)';
   const L = k => G.LOOKS[k];
   const DIG = { x: 199, y: 43, w: 4, h: 2 }; // excavation pit (tiles): fields by the εθνική, a little before the Ferrari farm
-  let npcs = [], lastBaskets = 0, crumbs = [], ladyT = 3;
+  let npcs = [], lastBaskets = 0, crumbs = [], ladyT = 3, dapT = 1.5, dapOn = 0, ouou = 0;
+  const DAP_LEN = 6.7;
 
   const say = (key, text, who, dur) => G.audio.say(key, text, who, dur);
   const near = (o, r) => { const p = G.player && (G.player.vehicle || G.player); return p && Math.hypot(p.x - o.x, p.y - o.y) < r; };
@@ -28,6 +31,14 @@
       npc('venga', 'cam_venga', port[0] + 1.6, port[1] - 0.2, 0),
       npc('lady_m', 'cam_lady_m', DIG.x - 1.4, DIG.y + 1, 2),
       npc('lady_b', 'cam_lady_b', DIG.x - 2.6, DIG.y + 1, 2),
+      // hospital yard (tiles x101-113, y43-46; entrance at x107): the chanter in the middle, everyone faces him
+      npc('dap', 'cam_dap', 107, 44.3, 0),
+      npc('guard1', 'cam_guard', 105.7, 44.1, 0),
+      npc('guard2', 'cam_guard2', 108.3, 44.1, 0),
+      npc('doc1', 'cam_doc_m', 105.4, 43.0, 3),
+      npc('doc2', 'cam_doc_f', 108.7, 43.1, 1),
+      npc('by1', 'cam_by_1', 103.6, 45.4, 2),
+      npc('by2', 'cam_by_2', 110.4, 45.6, 1),
     ];
     // the two ladies face each other
     get('lady_m').dir = 1; get('lady_b').dir = 2;
@@ -46,13 +57,13 @@
         const pl = get('pilot'); pl.hidden = false; pl.x = ex + 18; pl.y = ey; pl.dir = 1;
         setTimeout(() => say('cam_pilot', 'Άμα με ξαναχρειαστείς, σε βγάζω και από Κορυδαλλό.', pl, 3.4), 700);
       }
-      if (o.kind === 'train' && o.to === 'ΣΕΡΡΕΣ') { const t = get('telos'); setTimeout(() => say('cam_telos', 'ΤΕΛΟΣ.', t, 2.4), 600); }
+      if (o.kind === 'train' && o.to === 'ΣΕΡΡΕΣ') { const t = get('telos'); setTimeout(() => say('cam_telos', 'ΤΕΛΟΣ!', t, 2.4), 600); }
     },
   };
 
   const mod = {
     id: 'cameos',
-    reset() { build(); lastBaskets = G.bball ? G.bball.baskets : 0; crumbs = []; },
+    reset() { build(); lastBaskets = G.bball ? G.bball.baskets : 0; crumbs = []; dapT = 1.5; dapOn = 0; ouou = 0; parkAmbulance(); },
     update(dt) {
       if (!npcs.length) build();
       // court: every 3rd basket the man in the suit cheers
@@ -68,9 +79,17 @@
       // excavation: the line repeats while you are around
       ladyT -= dt;
       const lm = get('lady_m');
-      if (ladyT <= 0) { ladyT = near(lm, 150) ? G.rand(6, 9) : 1; if (near(lm, 150)) say('cam_millions', 'Έχετε πάρει εκατομμύρια!', lm, 2.8); }
+      if (ladyT <= 0) { ladyT = near(lm, 150) ? G.rand(6, 9) : 1; if (near(lm, 150)) say('cam_millions', 'Έχετε πάρει εκατομμύρια… Έχετε πάρει εκατομμύρια!', lm, 2.8); }
       // the ladies gesture a little while arguing
       lm.frame = Math.sin(G.t * 4) > 0.6 ? 1 : 0;
+      // hospital: the chant (≈6.7 s) repeats while you are around; he jumps and claps, the guards clap along
+      const dp = get('dap');
+      if (dapOn > 0) { dapOn -= dt; if (dapOn <= 0) ouou = 0.4; }
+      else { dapT -= dt; if (dapT <= 0) { if (near(dp, 190)) { dapOn = DAP_LEN; say('cam_dap', 'ΚΑΙ Α ΚΑΙ ΟΥ, ΚΑΙ ΟΥ, ΚΑΙ ΔΑΠ ΝΔΦΚ!', dp, DAP_LEN); dapT = G.rand(5, 7); } else dapT = 1; } }
+      if (ouou > 0) { ouou -= dt; if (ouou <= 0) { say('pitch_ouou', 'ΟΥΟΥΟΥ!', get(G.chance(0.5) ? 'by1' : 'by2'), 2.2); if (G.chance(0.6)) G.ui.bubble('ΟΥΟΥ!', get('doc1'), 1.6); } }
+      const on = dapOn > 0;
+      dp.hop = on ? Math.abs(Math.sin(G.t * 9)) * 5 : 0; dp.frame = on ? (Math.sin(G.t * 18) > 0 ? 1 : 2) : 0;
+      for (const id of ['guard1', 'guard2']) get(id).frame = on && Math.sin(G.t * 18 + (id === 'guard2' ? 1 : 0)) > 0.3 ? 1 : 0;
     },
     ground(ctx, camX, camY) { drawDig(ctx, DIG.x * TS - camX, DIG.y * TS - camY); },
     sprites(push, camX, camY) {
@@ -78,7 +97,8 @@
       for (const n of npcs) {
         if (n.hidden || !inView(n)) continue;
         push(n.y, c => {
-          G.drawPerson(c, n.look, n.x - camX, n.y - camY, n.dir, n.frame || 0);
+          if (n.hop) { c.fillStyle = SHADOW; c.beginPath(); c.ellipse(n.x - camX, n.y - camY + 1, 5, 1.8, 0, 0, 7); c.fill(); }
+          G.drawPerson(c, n.look, n.x - camX, n.y - camY - (n.hop || 0), n.dir, n.frame || 0);
           if (n.id === 'bball') drawPie(c, n.x - camX - 5, n.y - camY - 8 - (n.bite > 0 ? 3 : 0), n.bite > 0);
         });
       }
@@ -88,6 +108,14 @@
       if (colX > -30 && colX < G.W + 30 && colY > -60 && colY < G.H + 30) push((DIG.y + 1.6) * TS, c => drawColumn(c, colX, colY));
     },
   };
+
+  // the ambulance waits in the hospital yard (a real vehicle: you can take it; its light bar is painted on)
+  function parkAmbulance() {
+    const S = G.Sim, H = G.World.HOSPITAL; if (!S || !S.vehicles || !H || !G.Ent) return;
+    if (S.vehicles.some(v => v.ambHome && !v.dead)) return;
+    const v = new G.Ent.Vehicle('ambulance', (H.yard.x + H.yard.w - 1) * TS + 4, (H.yard.y + 1.6) * TS, -Math.PI / 2, '#f4f4f4');
+    v.parked = true; v.keep = true; v.ambHome = true; S.vehicles.push(v);
+  }
 
   // a triangle of spanakopita (golden filo, a green edge where it is bitten)
   function drawPie(c, x, y, bitten) {

@@ -239,7 +239,7 @@
     car:    { w: 22, h: 40 }, taxi: { w: 22, h: 40 },
     // Athens street mix: city hatchback (Yaris/Corsa/Panda/Polo/207/C3), mini (C1/Aygo/i10), Smart, sedan (Corolla/E-class), small SUV (Qashqai)
     city: { w: 22, h: 36 }, mini: { w: 20, h: 31 }, smart: { w: 20, h: 25 }, sedan: { w: 22, h: 43 }, suv: { w: 24, h: 41 }, police: { w: 22, h: 40 }, ferrari: { w: 22, h: 40 },
-    tincan: { w: 20, h: 36 }, van: { w: 24, h: 46 }, pickup: { w: 24, h: 44 }, bus: { w: 28, h: 84 },
+    tincan: { w: 20, h: 36 }, van: { w: 24, h: 46 }, ambulance: { w: 24, h: 48 }, pickup: { w: 24, h: 44 }, bus: { w: 28, h: 84 },
     truck:  { w: 32, h: 90 }, bike: { w: 8, h: 22 }, scooter: { w: 8, h: 18 }, moto: { w: 10, h: 24 },
     dias:   { w: 10, h: 24 }, heli: { w: 44, h: 60 }, sheeptruck: { w: 26, h: 50 }, garbage: { w: 28, h: 62 },
   };
@@ -317,11 +317,17 @@
       if (type === 'police') { P(4, ws + 9, 6, 3, '#2d6bff'); P(W - 10, ws + 9, 6, 3, '#ff2d2d'); P(1, H - 14, W - 2, 3, '#1d3f8f'); }
       if (type === 'ferrari') { P(W / 2 - 1, 3, 2, 3, '#ffd400'); P(2, H - 6, W - 4, 2, '#222'); }
       if (type === 'tincan') { P(4, 4, 3, 2, '#b8a888'); P(W - 7, H - 10, 3, 3, '#a8763a'); P(5, H - 8, 2, 2, '#a8763a'); }
-    } else if (type === 'van' || type === 'pickup' || type === 'sheeptruck') {
+    } else if (type === 'van' || type === 'ambulance' || type === 'pickup' || type === 'sheeptruck') {
       wheels([6, H - 13]);
       R(1, 0, W - 2, H, 4, grad(1, W - 2, dark, lite)); R(3, 1, W - 6, H - 2, 3, body);
       R(3, 5, W - 6, 6, 2, glass); P(5, 6, 4, 2, glassL); P(3, 0, 4, 2, '#fff7c0'); P(W - 7, 0, 4, 2, '#fff7c0');
       if (type === 'van') { R(3, 12, W - 6, H - 15, 2, lite); P(3, H - 2, 4, 2, '#e8302a'); P(W - 7, H - 2, 4, 2, '#e8302a'); }
+      else if (type === 'ambulance') {
+        R(3, 12, W - 6, H - 15, 2, '#fbfbfb'); P(3, H - 2, 4, 2, '#e8302a'); P(W - 7, H - 2, 4, 2, '#e8302a');
+        P(4, 12, W - 8, 3, '#1f4fd6'); P(5, 12.5, 3, 2, '#7fb0ff'); P(W - 8, 12.5, 3, 2, '#ff5a5a');   // light bar
+        P(1, 18, 2, H - 22, '#e23a3a'); P(W - 3, 18, 2, H - 22, '#e23a3a');                         // side stripes
+        const cx = W / 2, cy = 18 + (H - 22) / 2; P(cx - 1.8, cy - 6, 3.6, 12, '#e23a3a'); P(cx - 6, cy - 1.8, 12, 3.6, '#e23a3a'); // roof cross
+      }
       else {
         P(2, 13, W - 4, 2, '#333');
         R(3, 15, W - 6, H - 17, 1, type === 'sheeptruck' ? '#8a6a48' : G.shade(col, -0.45));
@@ -616,6 +622,13 @@
     cam_telos: { skin: '#e2b08c', hair: '#8e8a86', hairStyle: 'short', top: '#b98a52', top2: '#5a1e24', topStyle: 'jacket', legs: '#3a3a3a', acc: [] },
     cam_venga: { skin: '#e0aa86', hair: '#9a9690', hairStyle: 'slick', top: '#1c1c22', top2: '#2a2a30', topStyle: 'jacket', legs: '#222', acc: ['beardGrey', 'scarf:#f2c21b'] },
     cam_lady_m: { skin: '#ecc0a0', hair: '#7a4630', hairStyle: 'bob', top: '#6e1f2e', top2: '#ffffff', topStyle: 'shirt', legs: '#1c1c24', acc: ['shades'], female: true },
+    cam_dap:   { skin: '#e8b896', hair: '#1e1a18', hairStyle: 'slick', top: '#1d2c5a', top2: '#ffffff', topStyle: 'suit', legs: '#1d2c5a', shoes: '#111', acc: ['tie:#3a7bd5'] },
+    cam_guard: { skin: '#d9a27a', hair: '#1a1a1a', hairStyle: 'buzz', top: '#15151a', top2: '#ffffff', topStyle: 'suit', legs: '#15151a', shoes: '#111', acc: ['shades', 'tie:#15151a'] },
+    cam_guard2: { skin: '#c98e68', hair: '#2a2420', hairStyle: 'bald', top: '#15151a', top2: '#ffffff', topStyle: 'suit', legs: '#15151a', shoes: '#111', acc: ['shades', 'beard:#2a2420'] },
+    cam_doc_m: { skin: '#e2b08c', hair: '#8e8a86', hairStyle: 'short', top: '#f6f6f6', top2: '#7fb8d8', topStyle: 'jacket', legs: '#7fb8d8', shoes: '#f4f4f4', acc: ['glasses'] },
+    cam_doc_f: { skin: '#ecc0a0', hair: '#3a2418', hairStyle: 'bob', top: '#f6f6f6', top2: '#6fc0a8', topStyle: 'jacket', legs: '#6fc0a8', shoes: '#f4f4f4', acc: ['mask'], female: true },
+    cam_by_1:  { skin: '#d9a07a', hair: '#5a4632', hairStyle: 'short', top: '#c0392b', top2: '#c0392b', topStyle: 'tshirt', legs: '#2d3446', acc: [] },
+    cam_by_2:  { skin: '#e8b894', hair: '#9a9894', hairStyle: 'curly', top: '#8fa0b8', top2: '#8fa0b8', topStyle: 'shirt', legs: '#3a3a3a', acc: ['tote'], female: true },
     cam_lady_b: { skin: '#e8b894', hair: '#9a9894', hairStyle: 'curly', top: '#c8b48e', top2: '#b09a74', topStyle: 'jacket', legs: '#2d3446', acc: [], female: true },
     fd_waiter1:{ skin: '#e0b090', hair: '#6a6a66', hairStyle: 'bald', top: '#f4f4f4', top2: '#111', topStyle: 'vest', legs: '#111', acc: ['beardGrey'] },
     fd_waiter2:{ skin: '#f0c8a8', hair: '#3a2014', hairStyle: 'curly_long', top: '#f4f4f4', topStyle: 'shirt', top2: '#111', legs: '#151515', skirt: true, acc: ['lipstick'], female: true },

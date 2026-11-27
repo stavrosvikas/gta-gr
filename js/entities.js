@@ -1503,7 +1503,7 @@
       c.hitCd = G.state.wanted >= 5 ? 1.1 : 1.6; G.audio.sfx('punch');
       G.worldScene.damage(G.state.wanted >= 5 ? 7 : 5);
     }
-    if (c.cop === 'lera' && d < 90 && c.said < 0) { G.audio.say('cop_lera', 'Μεγάλο λαμόγιο… λέρα!', c); c.said = 8; }
+    if (c.cop === 'lera' && d < 90 && c.said < 0) { G.audio.say('cop_lera', 'Μεγάλο λαμόγιο…', c); c.said = 8; }
   }
   // arrest: a cop must stay next to you while you're (almost) still, for a moment
   function arrestCheck(dt) {
@@ -1515,7 +1515,7 @@
     else S.arrest = Math.max(0, (S.arrest || 0) - dt * 0.8);
     if (S.arrest >= 1 && G.top() === G.worldScene && !G.worldScene.busted) {
       S.arrest = 0;
-      if (near.cop === 'agapi') G.audio.say('cop_agapi', 'Αγάπη μόνο!', near, 2); else G.audio.say('cop_lera', 'Μεγάλο λαμόγιο… λέρα!', near, 2);
+      if (near.cop === 'agapi') G.audio.say('cop_agapi', 'Αγάπη μόνο!', near, 2); else G.audio.say('cop_lera', 'Μεγάλο λαμόγιο…', near, 2);
       G.worldScene.bust();
     }
   }

@@ -242,6 +242,7 @@
         x.fillStyle = sh(skin, -0.45); x.beginPath(); if (side) x.ellipse(hx + 3.9, 10.3, 0.5, 0.3, 0, 0, 7); else x.ellipse(hx, 10.3, 0.75, 0.35, 0, 0, 7); x.fill();
       }
       if (!fem && has('mustache')) { blob(() => { if (side) x.ellipse(hx + 4, 9.5, 1.3, 0.55, -0.2, 0, 7); else { x.ellipse(hx - 1.1, 9.45, 1.35, 0.6, 0.25, 0, 7); x.ellipse(hx + 1.1, 9.45, 1.35, 0.6, -0.25, 0, 7); } }, has('beardGrey') ? '#a9a8a2' : hair, -0.3, -0.3); }
+      if (has('mole')) { x.fillStyle = '#3a2418'; x.beginPath(); if (side) x.arc(hx + 4.5, 9.0, 0.42, 0, 7); else x.arc(hx - 1.75, 9.15, 0.42, 0, 7); x.fill(); }
       if (has('mask')) { line('#e8e8e8', 0.25); x.beginPath(); x.moveTo(hx - HW + 0.4, 8.8); x.lineTo(hx - HW - 0.2, 7.6); x.moveTo(hx + HW - 0.4, 8.8); x.lineTo(hx + HW + 0.2, 7.6); x.stroke(); blob(side ? rrf(hx + 0.8, 8.3, 4.7, 3.3, 1.4) : rrf(hx - 4.4, 8.4, 8.8, 3.3, 1.5), '#5b8fd6', -0.4, -0.3); line('#3e6fb4', 0.25); x.beginPath(); x.moveTo(side ? hx + 1.2 : hx - 3.6, 9.5); x.lineTo(side ? hx + 5.2 : hx + 3.6, 9.5); x.moveTo(side ? hx + 1.2 : hx - 3.6, 10.5); x.lineTo(side ? hx + 5.2 : hx + 3.6, 10.5); x.stroke(); }
       if (has('shades')) {
         x.fillStyle = '#121218';

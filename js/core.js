@@ -108,7 +108,7 @@ G.newState = () => ({
   money: 150, health: 100, wanted: 0,
   look: null, outfit: 'casual',
   done: {},              // quest id -> true
-  radioOn: false, story: 0,
+  radioOn: true, story: 0,
   playTime: 0,
 });
 G.load = () => { try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && s.look) return s; } catch (e) {} return null; };

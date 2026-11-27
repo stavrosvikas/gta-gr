@@ -6,7 +6,7 @@
 //   εθνική: a small excavation (one column) in the fields by the road out of town, two ladies arguing next to it
 //   hospital (by the first signpost on the εθνική): a man in a suit jumps and claps chanting, two bodyguards beside him,
 //           two doctors around him, two passers-by staring; after each chant someone goes «ΟΥΟΥΟΥ»; ambulance parked in the yard
-// VOICE KEYS (optional files, bubbles always show): vo_cam_onfire, vo_cam_pilot, vo_cam_telos, vo_cam_venga, vo_cam_millions, vo_cam_dap (+ reuses vo_pitch_ouou)
+// VOICE KEYS (optional files, bubbles always show): vo_cam_onfire, vo_cam_pilot, vo_cam_telos, vo_cam_venga, vo_cam_millions, vo_cam_dap
 'use strict';
 (function () {
   const TS = G.TS || 16;
@@ -50,7 +50,7 @@
     depart(o) {
       if (o.kind === 'heli') get('pilot').hidden = true; // he flies you
       const v = get('venga'), p = G.player;
-      if ((o.kind === 'ship' || o.kind === 'boat') && v && Math.hypot(p.x - v.x, p.y - v.y) < 160) say('cam_venga', 'VENGA VENGA!', v, 2.8);
+      if ((o.kind === 'ship' || o.kind === 'boat') && v && Math.hypot(p.x - v.x, p.y - v.y) < 160) say('cam_venga', 'VENGA! VENGA!', v, 2.8);
     },
     arrive(o, ex, ey) {
       if (o.kind === 'heli') {
@@ -85,8 +85,10 @@
       // hospital: the chant (≈6.7 s) repeats while you are around; he jumps and claps, the guards clap along
       const dp = get('dap');
       if (dapOn > 0) { dapOn -= dt; if (dapOn <= 0) ouou = 0.4; }
-      else { dapT -= dt; if (dapT <= 0) { if (near(dp, 190)) { dapOn = DAP_LEN; say('cam_dap', 'ΚΑΙ Α ΚΑΙ ΟΥ, ΚΑΙ ΟΥ, ΚΑΙ ΔΑΠ ΝΔΦΚ!', dp, DAP_LEN); dapT = G.rand(5, 7); } else dapT = 1; } }
-      if (ouou > 0) { ouou -= dt; if (ouou <= 0) { say('pitch_ouou', 'ΟΥΟΥΟΥ!', get(G.chance(0.5) ? 'by1' : 'by2'), 2.2); if (G.chance(0.6)) G.ui.bubble('ΟΥΟΥ!', get('doc1'), 1.6); } }
+      else { dapT -= dt; if (dapT <= 0) { if (near(dp, 190)) { dapOn = DAP_LEN; say('cam_dap', 'ΚΑΙ Α ΚΑΙ ΟΥ, ΚΑΙ ΟΥ, ΚΑΙ ΔΑΠ ΝΔΦΚ!', dp, DAP_LEN / 2); setTimeout(() => G.ui.bubble('ΚΑΙ Α ΚΑΙ ΟΥ, ΚΑΙ ΟΥ, ΚΑΙ ΔΑΠ ΝΔΦΚ!', dp, DAP_LEN / 2), DAP_LEN * 500); dapT = G.rand(5, 7); } else dapT = 1; } }
+      if (ouou > 0) { ouou -= dt; if (ouou <= 0) { // booing: bubbles only, no sound
+        const who = ['by1', 'by2', 'doc1', 'doc2'].filter(() => G.chance(0.6)); if (!who.length) who.push('by1');
+        who.forEach((id, i) => setTimeout(() => G.ui.bubble(G.pick(['ΟΥΟΥΟΥ!', 'ΟΥΟΥΟΥΟΥ!', 'ΟΥΟΥ!']), get(id), 1.8), i * 350)); } }
       const on = dapOn > 0;
       dp.hop = on ? Math.abs(Math.sin(G.t * 9)) * 5 : 0; dp.frame = on ? (Math.sin(G.t * 18) > 0 ? 1 : 2) : 0;
       for (const id of ['guard1', 'guard2']) get(id).frame = on && Math.sin(G.t * 18 + (id === 'guard2' ? 1 : 0)) > 0.3 ? 1 : 0;

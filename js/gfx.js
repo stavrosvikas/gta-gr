@@ -622,7 +622,7 @@
     cam_telos: { skin: '#e2b08c', hair: '#8e8a86', hairStyle: 'short', top: '#b98a52', top2: '#5a1e24', topStyle: 'jacket', legs: '#3a3a3a', acc: [] },
     cam_venga: { skin: '#e0aa86', hair: '#9a9690', hairStyle: 'slick', top: '#1c1c22', top2: '#2a2a30', topStyle: 'jacket', legs: '#222', acc: ['beardGrey', 'scarf:#f2c21b'] },
     cam_lady_m: { skin: '#ecc0a0', hair: '#7a4630', hairStyle: 'bob', top: '#6e1f2e', top2: '#ffffff', topStyle: 'shirt', legs: '#1c1c24', acc: ['shades'], female: true },
-    cam_dap:   { skin: '#e8b896', hair: '#1e1a18', hairStyle: 'slick', top: '#1d2c5a', top2: '#ffffff', topStyle: 'suit', legs: '#1d2c5a', shoes: '#111', acc: ['tie:#3a7bd5'] },
+    cam_dap:   { skin: '#e8b896', hair: '#1e1a18', hairStyle: 'slick', top: '#1d2c5a', top2: '#ffffff', topStyle: 'suit', legs: '#1d2c5a', shoes: '#111', acc: ['tie:#3a7bd5', 'mole'] },
     cam_guard: { skin: '#d9a27a', hair: '#1a1a1a', hairStyle: 'buzz', top: '#15151a', top2: '#ffffff', topStyle: 'suit', legs: '#15151a', shoes: '#111', acc: ['shades', 'tie:#15151a'] },
     cam_guard2: { skin: '#c98e68', hair: '#2a2420', hairStyle: 'bald', top: '#15151a', top2: '#ffffff', topStyle: 'suit', legs: '#15151a', shoes: '#111', acc: ['shades', 'beard:#2a2420'] },
     cam_doc_m: { skin: '#e2b08c', hair: '#8e8a86', hairStyle: 'short', top: '#f6f6f6', top2: '#7fb8d8', topStyle: 'jacket', legs: '#7fb8d8', shoes: '#f4f4f4', acc: ['glasses'] },

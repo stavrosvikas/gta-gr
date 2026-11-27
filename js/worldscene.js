@@ -43,7 +43,8 @@
   WS.enter = function () {
     const st = G.state;
     if (st.story == null) st.story = 0; st.wanted = 0;
-    if (st.sms) st.sms = st.sms.filter(m => !m.text.includes('έξω από τα σουβλάκια')); // old wording if (st.radioOn == null) st.radioOn = false;
+    if (st.sms) st.sms = st.sms.filter(m => !m.text.includes('έξω από τα σουβλάκια')); // old wording
+    if (!st.radioDef) { st.radioDef = 1; st.radioOn = true; } // radio defaults to ON (older saves had it off)
     S.reset(); S.spawnParked();
     const sp = WS.placeNear([44, 46], walk);
     G.player = G.Ent.makePlayer(sp[0] * TS + 8, sp[1] * TS + 10); G.player.look = st.look; G.player.dir = 3;

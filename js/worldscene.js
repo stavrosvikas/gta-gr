@@ -713,7 +713,7 @@
         U.title(G.W / 2, 50, 'ΤΟ ΧΡΕΟΣ ΕΞΟΦΛΗΘΗΚΕ', 18, '#4cd964');
         if (this.t > 2) U.text(G.W / 2, 80, 'Η υπάλληλος σφραγίζει το χαρτί. Χαμογελάει.', 10, '#fff', 'center');
         if (this.t > 3.5) U.wrap('ΥΠΑΛΛΗΛΟΣ: «Α, και €200 και πινακίδες για παράνομο πάρκινγκ. Περάστε από Τρίτη.»', G.W - 40, 10).forEach((l, k) => U.text(G.W / 2, 98 + k * 12, l, 10, '#ffd400', 'center'));
-        if (this.t > 5) { if (!WS.endLogo) { WS.endLogo = new Image(); WS.endLogo.src = 'assets/logo/gta_gr.svg?v=1'; }
+        if (this.t > 5) { if (!WS.endLogo) { WS.endLogo = new Image(); WS.endLogo.src = 'assets/logo/gta_gr.svg?v=2'; }
           const L = WS.endLogo, w = 150, h = w * 738.82 / 1315.95; U.ctx.globalAlpha = Math.min(1, (this.t - 5) * 2);
           if (L.complete && L.naturalWidth) U.ctx.drawImage(L, G.W / 2 - w / 2, 126, w, h); else U.title(G.W / 2, 160, 'GTA GR', 26, '#ff3e8a');
           U.ctx.globalAlpha = 1; }

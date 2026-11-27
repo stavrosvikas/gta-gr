@@ -149,8 +149,10 @@
   }
 
   // ---- camera: angled top-down follow, like the 2D game but in 3D ----
-  const cam = new BABYLON.ArcRotateCamera('cam', -Math.PI / 2, 0.95, 14, player.position.clone(), scene);
-  cam.lowerRadiusLimit = 7; cam.upperRadiusLimit = 26; cam.attachControl(canvas, true); cam.inputs.removeByType('ArcRotateCameraKeyboardMoveInput');
+  // third person: the camera sits behind the player and swings round behind them as they move (mouse can still orbit)
+  const cam = new BABYLON.ArcRotateCamera('cam', -Math.PI / 2, 1.22, 5.2, player.position.clone(), scene);
+  cam.lowerRadiusLimit = 3; cam.upperRadiusLimit = 12; cam.lowerBetaLimit = 0.6; cam.upperBetaLimit = 1.45; cam.minZ = 0.05;
+  const behind = (yaw, k) => { const want = -yaw - Math.PI / 2; let d = want - cam.alpha; d = Math.atan2(Math.sin(d), Math.cos(d)); cam.alpha += d * k; }; cam.attachControl(canvas, true); cam.inputs.removeByType('ArcRotateCameraKeyboardMoveInput');
   cam.wheelPrecision = 30;
 
   const collide = (p, rad) => { for (const s of solids) { if (p.x > s.x0 - rad && p.x < s.x1 + rad && p.z > s.z0 - rad && p.z < s.z1 + rad) {
@@ -167,15 +169,17 @@
         const mx = a.x * Math.cos(camYaw) - a.y * Math.sin(camYaw), mz = -a.x * Math.sin(camYaw) - a.y * Math.cos(camYaw), l = Math.hypot(mx, mz);
         const sp = (run ? 5.2 : 2.6) * dt; player.position.x += mx / l * sp; player.position.z += mz / l * sp;
         const want = Math.atan2(mx, mz); player.rotation = new BABYLON.Vector3(0, want, 0); play(player, run ? 'sprint' : 'walk');
+        if (a.y < 0) behind(want, 0.04); // walking forward: camera eases in behind
       } else play(player, 'idle');
       collide(player.position, 0.25); player.position.y = groundY(player.position);
-      cam.target = BABYLON.Vector3.Lerp(cam.target, player.position.add(new BABYLON.Vector3(0, 0.6, 0)), 0.12);
+      cam.target = BABYLON.Vector3.Lerp(cam.target, player.position.add(new BABYLON.Vector3(0, 0.75, 0)), 0.2);
     } else {
       const a = axis(), c = driving;
       const acc = -a.y, steer = a.x;
       c.v += acc * 11 * dt; c.v *= 0.985; c.v = Math.max(-5, Math.min(16, c.v));
       c.heading += steer * dt * 2.2 * Math.max(-1, Math.min(1, c.v / 5));
-      cam.target = BABYLON.Vector3.Lerp(cam.target, c.r.position.add(new BABYLON.Vector3(0, 0.6, 0)), 0.12);
+      cam.target = BABYLON.Vector3.Lerp(cam.target, c.r.position.add(new BABYLON.Vector3(0, 0.9, 0)), 0.2);
+      cam.radius += ((Math.abs(c.v) > 3 ? 8 : 7) - cam.radius) * 0.05; behind(Math.PI / 2 - c.heading, 0.06);
     }
     // cars
     for (const c of cars) {

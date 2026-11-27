@@ -10,7 +10,7 @@
     ctx.fillStyle = 'rgba(10,6,20,0.55)'; ctx.fillRect(0, 0, G.W, G.H);
   }
   // the user's GTA GR logo (SVG)
-  const LOGO = new Image(); LOGO.src = 'assets/logo/gta_gr.svg?v=2';
+  const LOGO = new Image(); LOGO.src = 'assets/logo/gta_gr.svg?v=4';
   function logo(y, size = 1) {
     const c = U.ctx;
     if (LOGO.complete && LOGO.naturalWidth) {

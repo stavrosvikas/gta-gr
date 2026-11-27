@@ -638,8 +638,8 @@
   G.StoryIntro = function () {
     // short intro: you're back in Athens with a suitcase, and the phone starts ringing
     const cards = [
-      ['ΑΘΗΝΑ, 2026', 'Γύρισες. Μια βαλίτσα, ένα κινητό, κανένα σχέδιο.'],
-      ['ΤΟ ΚΙΝΗΤΟ ΧΤΥΠΑΕΙ', `Η Εφορία θέλει ${G.fmtMoney(G.DEBT)}. Το κινητό σου θα φέρνει δουλειές. Το ★ στον χάρτη δείχνει πού πας.`],
+      ['ΑΘΗΝΑ, 2026', 'Γύρισες. Μια βαλίτσα, ένα κινητό, κανένα σχέδιο, κανένα ΕΣΠΑ.'],
+      ['ΤΟ ΚΙΝΗΤΟ ΧΤΥΠΑΕΙ', 'Χρωστάς 2k στην Εφορία. Στο κινητό σου θα σου έρχονται δουλειές. Το ★ στον χάρτη δείχνει πού πας για να hustleάρεις.'],
     ];
     const INK = 'rgba(28,20,36,0.9)';
     const rr = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); };
@@ -697,7 +697,8 @@
         U.title(G.W / 2, 34, t, 20, '#ffd400');
         U.wrap(s, G.W - 70, 10).forEach((l, k) => U.text(G.W / 2, 54 + k * 13, l, 10, '#fff', 'center'));
         U.ctx.globalAlpha = 1;
-        U.text(G.W / 2, G.H - 10, (this.i + 1) + '/' + cards.length + (G.device === 'mobile' ? '  · άγγιξε για συνέχεια' : '  · ENTER για συνέχεια'), 8, '#ffd6ea', 'center');
+        const last = this.i >= cards.length - 1;
+        U.text(G.W / 2, G.H - 10, (this.i + 1) + '/' + cards.length + (G.device === 'mobile' ? (last ? '  · άγγιξε: Το ταξίδι ξεκινάει' : '  · άγγιξε για συνέχεια') : (last ? '  · ENTER: Το ταξίδι ξεκινάει' : '  · ENTER για συνέχεια')), 8, '#ffd6ea', 'center');
         U.drawMobile();
       },
     };
@@ -711,10 +712,10 @@
         ctx.fillStyle = '#0b0812'; ctx.fillRect(0, 0, G.W, G.H); U.begin();
         U.title(G.W / 2, 50, 'ΤΟ ΧΡΕΟΣ ΕΞΟΦΛΗΘΗΚΕ', 18, '#4cd964');
         if (this.t > 2) U.text(G.W / 2, 80, 'Η υπάλληλος σφραγίζει το χαρτί. Χαμογελάει.', 10, '#fff', 'center');
-        if (this.t > 3.5) U.text(G.W / 2, 100, '«Α, και €12,40 τόκοι υπερημερίας. Περάστε την Τρίτη.»', 10, '#ffd400', 'center');
+        if (this.t > 3.5) U.wrap('ΥΠΑΛΛΗΛΟΣ: «Α, και €200 και πινακίδες για παράνομο πάρκινγκ. Περάστε από Τρίτη.»', G.W - 40, 10).forEach((l, k) => U.text(G.W / 2, 98 + k * 12, l, 10, '#ffd400', 'center'));
         if (this.t > 5) { if (!WS.endLogo) { WS.endLogo = new Image(); WS.endLogo.src = 'assets/logo/gta_gr.svg?v=1'; }
           const L = WS.endLogo, w = 150, h = w * 738.82 / 1315.95; U.ctx.globalAlpha = Math.min(1, (this.t - 5) * 2);
-          if (L.complete && L.naturalWidth) U.ctx.drawImage(L, G.W / 2 - w / 2, 118, w, h); else U.title(G.W / 2, 160, 'GTA GR', 26, '#ff3e8a');
+          if (L.complete && L.naturalWidth) U.ctx.drawImage(L, G.W / 2 - w / 2, 126, w, h); else U.title(G.W / 2, 160, 'GTA GR', 26, '#ff3e8a');
           U.ctx.globalAlpha = 1; }
         if (this.t > 6) U.text(G.W / 2, G.H - 16, G.device === 'mobile' ? 'Πάτα OK για free roaming' : 'Πάτα ENTER για free roaming', 8, '#ccc', 'center');
         U.drawMobile();
